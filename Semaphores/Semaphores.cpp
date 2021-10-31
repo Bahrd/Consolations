@@ -22,9 +22,9 @@ int main()
         auto promise = std::promise<void>();
         auto first_shift = std::thread([&]
         {
-            std::cout << "Our shift starts...\n";
+            std::cout << "[Our shift] starts...\n";
             std::this_thread::sleep_for(1s);
-            std::cout << "Our shift ends...\n";
+            std::cout << "[Our shift] ends...\n";
             // There is a kind of a mutual exclusion area here...
             promise.set_value();
         });
@@ -35,11 +35,11 @@ int main()
                 auto future = promise.get_future();
                 // Here a consumer is trying to acquire a semaphore.
                 // A 'future.get()' also works...
-                std::cout << (future.wait(), "A new shift has just got a seal of approval!\n");
+                std::cout << (future.wait(), "[New shift] has just got a seal of approval!\n");
             }
             catch (std::exception& e)
             {
-                std::cerr << "Consumer C error...: " << e.what() << std::endl;
+                std::cerr << "[New shift] an error occured: " << e.what() << std::endl;
             }
         });
         // A bureaucratic artifact No. I++

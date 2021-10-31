@@ -12,8 +12,8 @@
 int main()
 {
     using namespace std::literals;
-    auto account_balance = 0, payments = 0, withdrawals = 0;
     static std::mutex account;
+    auto account_balance = 0, payments = 0, withdrawals = 0;
 
     // "Once upon a time..."
     // In a bank...
@@ -22,7 +22,7 @@ int main()
         while (payments + withdrawals < 100)
         {
             std::lock_guard<std::mutex> lock(account);
-            // All subsequent operations 
+            // All subsequent operations  
             // ♫to the end of time♫ - or of this scope are now atomic-like...
             std::this_thread::sleep_for(0b100ms);
             ++payments, account_balance += 1;
@@ -44,8 +44,8 @@ int main()
         }
     });
     payment.join(); withdrawal.join();
-    //  ♫ And what have you got at the end of the day?
-    //    What have you got to take away? ♫
+    //  ♫And what have you got at the end of the day?
+    //   What have you got to take away?♫
     std::cout << std::format("\nShould be:\t${}.00 (= ${}.00 - ${}.00)", 
                              payments - withdrawals, payments, withdrawals)
               << std::format("\nActual balance:\t${}.00", account_balance);

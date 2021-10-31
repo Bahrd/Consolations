@@ -5,6 +5,11 @@
 #include <ranges>
 #include <string>
 
+/*Programming is one of the most difficult branches of applied mathematics; 
+  the poorer mathematicians had better remain pure mathematicians." 
+  Edsger W Dijkstra, "How do we tell truths that might hurt?", 1975
+  */
+
 // A specialization (the recursion stopper) of the...
 template<typename T>
 void vtprint(T const &value = T())

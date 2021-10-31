@@ -9,9 +9,10 @@
 #include <semaphore>
 #include <thread>
 /*
-* "The art of programming is the art of organizing complexity, 
-  of mastering multitude and avoiding its bastard chaos as effectively as possible." 
-  Edsger W Dijkstra, "Notes On Structured Programming", 1970
+ "[...] computer programming is an art, because it applies accumulated knowledge 
+  to the world, because it requires skill and ingenuity, and especially because 
+  it produces objects of beauty." 
+  Donald E Knuth, "The Art of Computer Programming", 1968
   https://quotablemath.blogspot.com/2021/08/out-of-context-programming-is.html
 */
 using namespace std::literals;
@@ -226,7 +227,8 @@ int main()
     }
     {
         // An anonymous and asynchronous (and almost templatized...) 
-        // recursive function... (pms stands for 'parallel massive summation', say...)
+        // recursive function... 
+        // A 'pms' acronym stands for 'parallel massive summation'. Yup, really... 
         std::vector<int> v(0x1000, 0b01);
         using T = std::vector<int>::const_iterator;
         std::function<int(T, T)> pms = [&](T beg, T end)
