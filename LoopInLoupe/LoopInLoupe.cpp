@@ -12,7 +12,7 @@
 int main()
 {
     using namespace std::literals;
-    static std::mutex account;
+    std::mutex account;
     auto account_balance = 0, payments = 0, withdrawals = 0;
 
     // "Once upon a time..."
@@ -21,9 +21,10 @@ int main()
     {
         while (payments + withdrawals < 100)
         {
-            std::lock_guard<std::mutex> lock(account);
-            // All subsequent operations  
-            // ♫to the end of time♫ - or of this scope are now atomic-like...
+            //std::lock_guard<std::mutex> lock(account);
+            // All subsequent operations ♫to the end of time♫ 
+            // or rather 'to the end of this scope'
+            // are now atomic-like...
             std::this_thread::sleep_for(0b100ms);
             ++payments, account_balance += 1;
 
@@ -35,10 +36,10 @@ int main()
     {
         while (payments + withdrawals < 100)
         {
-            std::lock_guard<std::mutex> lock(account);
+            //std::lock_guard<std::mutex> lock(account);
             // Note that the access to the variables in the scope is random...
-            std::this_thread::sleep_for(0b100ms);
             account_balance -= 1, ++withdrawals;
+            std::this_thread::sleep_for(0b100ms);
 
             std::cout << '-'; // A '«regress» indicator'...
         }

@@ -168,7 +168,7 @@ int main()
     {
         // A account access (i.e. an obnoxiously innocuously lookin') example 
         auto account_balance = 0, payments = 0, withdrawals = 0;
-        static std::mutex teller;
+        std::mutex teller;
 
         while (payments + withdrawals < 0x100)
         {
@@ -201,7 +201,7 @@ int main()
         // A writer-readers problem
         std::mutex m;
         std::condition_variable cv;
-        static auto written = false;
+        auto written = false;
 
         auto reader_thread = [&](std::string const &name)
         {
