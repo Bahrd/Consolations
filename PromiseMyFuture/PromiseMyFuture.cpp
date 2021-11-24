@@ -18,6 +18,8 @@
 using namespace std::literals;
 int main()
 {
+    // An ATOM-ic operation... 
+    // Parmenides: "Only Being exists and [...] Not-Being is not, and can never be"
     {
         auto eleatic_principle = std::atomic_bool(false);
         auto philosopher = std::thread([&]()
@@ -35,16 +37,15 @@ int main()
 
         auto seeker_after_truth = std::thread([&]()
         {
-            // Consider an ontological (or epistemological?) problem for just a second...
             std::cout << "The truth will soon be revealed!\n";
+            // Consider an ontological (or epistemological?) problem for just a second second...
             std::this_thread::sleep_for(1s);
             // ... to find a definitive answer:
             eleatic_principle = true;
             // ... and to share the good news!
             eleatic_principle.notify_all();
         });
-        philosopher.join(); freethinker.join();
-        seeker_after_truth.join();
+        for (auto t : { &philosopher, &freethinker, &seeker_after_truth }) t->join();
     }
     {
         // A Producer's "PUSH" that also defines the return value type
@@ -100,8 +101,7 @@ int main()
                 }
             });
         // A bureaucratic artifact (from Honoré de Balzac to Vercingetorix (a.k.a. Asterix))
-        producer.join(); 
-        consumer_A.join(); consumer_B.join();
+        for (auto&& p : { &producer, &consumer_A, &consumer_B}) p->join();
     }
     {
         // A binary semaphore...
@@ -223,7 +223,7 @@ int main()
             std::cout << "... right now!\n";
         }
         cv.notify_all();
-        reader_I.join(); reader_II.join(); reader_III.join();
+        for (auto&& t : { &reader_I, &reader_II, &reader_III}) t->join();
     }
     {
         // An anonymous and asynchronous (and almost templatized...) 
