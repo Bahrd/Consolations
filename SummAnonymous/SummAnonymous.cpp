@@ -25,7 +25,7 @@ int main()
     // vs the standard library one...
     {
         auto [tick, summa, tack] = std::tuple(std::chrono::high_resolution_clock::now(), 
-                                              pms(begin(v), end(v)),
+                                              std::reduce(std::execution::par, begin(v), end(v), 000),
                                               std::chrono::high_resolution_clock::now());
         std::cout << "Anonymously asynchronous summa = " << summa
                   << " after " << std::fixed << std::setprecision(1)
@@ -33,7 +33,7 @@ int main()
     }
     {
         auto tick = std::chrono::high_resolution_clock::now();
-        auto summa = std::reduce(std::execution::par, begin(v), end(v), 000);
+        auto summa = pms(begin(v), end(v));
         auto tack = std::chrono::high_resolution_clock::now();
         std::cout << std::format("Standard asynchronous summa = {} after {}\n", summa,
                                  std::chrono::duration<double, std::milli>(tack - tick));
