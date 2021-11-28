@@ -15,6 +15,7 @@
   Donald E Knuth, "The Art of Computer Programming", 1968
   https://quotablemath.blogspot.com/2021/08/out-of-context-programming-is.html
 */
+
 using namespace std::literals;
 int main()
 {
@@ -166,38 +167,6 @@ int main()
         worker.join(); principal.join();
     }
     {
-        // A account access (i.e. an obnoxiously innocuously lookin') example 
-        auto account_balance = 0, payments = 0, withdrawals = 0;
-        std::mutex teller;
-
-        while (payments + withdrawals < 0x100)
-        {
-            // Here, in the bank...
-            auto payment = std::thread([&]()
-                {
-                    std::lock_guard<std::mutex> lock(teller);
-                    // All subsequent operations (to the end of the scope) 
-                    // are now atomic-like...
-                    std::this_thread::sleep_for(10ms);
-                    account_balance += 10;
-                    ++payments;
-                });
-            // ... and in the middle of nowhere...
-            auto withdrawal = std::thread([&]()
-                {
-                    std::lock_guard<std::mutex> lock(teller);
-                    // Note that the access to the variables in the 
-                    // scope is random...
-                    std::this_thread::sleep_for(10ms);
-                    account_balance -= 10;
-                    ++withdrawals;
-                });
-            payment.join(); withdrawal.join();
-        }
-        std::cout << std::format("Should be:\t${}.00\n", (payments - withdrawals) * 10)
-                  << std::format("Actual balance:\t${}.00\n", account_balance);
-    }
-    {
         // A writer-readers problem
         std::mutex m;
         std::condition_variable cv;
@@ -225,26 +194,6 @@ int main()
         cv.notify_all();
         for (auto&& t : { &reader_I, &reader_II, &reader_III}) t->join();
     }
-    {
-        // An anonymous and asynchronous (and almost templatized...) 
-        // recursive function... 
-        // A 'pms' acronym stands for 'parallel massive summation'. Yup, really... 
-        std::vector<int> v(0x1000, 0b01);
-        using T = std::vector<int>::const_iterator;
-        std::function<int(T, T)> pms = [&](T beg, T end)
-        {
-            auto len = end - beg;
-            if (len < 0x100) return std::accumulate(beg, end, 000);
-            
-            auto mid = beg + len/0b10;
-            auto launch_mode = std::launch::deferred | std::launch::async;
-            auto async = std::async(launch_mode, pms, mid, end);
-            return pms(beg, mid) + async.get();
-        };
-        // An asynchronous parallel anonymous example recursive invocation...
-        std::cout << "\nAnonymously asynchronous summa = " 
-                  << pms(begin(v), end(v)) << '\n';
-    }
     return 0;
 }
 /**
@@ -257,4 +206,68 @@ then his thought is free, however odd his conclusions may seem.
 — 
 Bertrand Russell, The Value of Free Thought.
 How to Become a Truth-Seeker and Break the Chains of Mental Slavery
+ */
+/** OUTAKES:
+     template <typename T>
+     int par_sum(T beg, T end)
+     {
+         auto len = end - beg;
+         if (len < 100) return std::accumulate(beg, end, 0);
+
+         T mid = beg + len / 2;
+         auto handle = std::async(std::launch::async, par_sum<T>, mid, end);
+         int sum = par_sum(beg, mid);
+         return sum + handle.get();
+     };
+     {
+         // using T = std::vector<int>::const_iterator;  // One way...
+         std::vector<int> v(0x1000, 0b1);
+         using T = decltype(begin(v));                   // ... or another.
+         std::function<int(T, T)> pms = [&pms, &v](T a, T b)
+         {
+             auto len = b - a;
+             if (len < 0x100) return std::accumulate(a, b, 0b0);
+
+             auto m = a + len / 0b10;
+             auto handle = std::async(std::launch::async, pms, m, b);
+             auto sum = pms(a, m);
+             return sum + handle.get();
+         };
+         // A parallel recurrence (anonymous and not) example invocation...
+         std::cout << std::format("Are both signed and anonymous sums made equal?\nIs {} == {}?\n",
+             par_sum(begin(v), end(v)),
+             pms(begin(v), end(v)));
+     }
+    {
+        // A account access (i.e. an obnoxiously innocuously lookin') example
+        auto account_balance = 0, payments = 0, withdrawals = 0;
+        std::mutex teller;
+
+        while (payments + withdrawals < 0x100)
+        {
+            // Here, in the bank...
+            auto payment = std::thread([&]()
+                {
+                    std::lock_guard<std::mutex> lock(teller);
+                    // All subsequent operations (to the end of the scope)
+                    // are now atomic-like...
+                    std::this_thread::sleep_for(10ms);
+                    account_balance += 10;
+                    ++payments;
+                });
+            // ... and in the middle of nowhere...
+            auto withdrawal = std::thread([&]()
+                {
+                    std::lock_guard<std::mutex> lock(teller);
+                    // Note that the access to the variables in the
+                    // scope is random...
+                    std::this_thread::sleep_for(10ms);
+                    account_balance -= 10;
+                    ++withdrawals;
+                });
+            payment.join(); withdrawal.join();
+        }
+        std::cout << std::format("Should be:\t${}.00\n", (payments - withdrawals) * 10)
+                  << std::format("Actual balance:\t${}.00\n", account_balance);
+    }
  */
