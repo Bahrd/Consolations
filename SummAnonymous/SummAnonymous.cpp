@@ -28,13 +28,14 @@ int main()
                                               pms(begin(v), end(v)),
                                               std::chrono::high_resolution_clock::now());
         std::cout << "Anonymously asynchronous summa = " << summa
-                  << "after " << std::chrono::duration<double, std::milli>(tick - tack) << "\n";
+                  << " after " << std::fixed << std::setprecision(1)
+                  << std::chrono::duration<double, std::milli>(tick - tack) << "\n";
     }
     {
         auto tick = std::chrono::high_resolution_clock::now();
         auto summa = std::reduce(std::execution::par, begin(v), end(v), 000);
         auto tack = std::chrono::high_resolution_clock::now();
-        std::cout << std::format("Standard asynchronous summa = {} after {}\n", summa, 
+        std::cout << std::format("Standard asynchronous summa = {} after {}\n", summa,
                                  std::chrono::duration<double, std::milli>(tack - tick));
     }
     return 0;
