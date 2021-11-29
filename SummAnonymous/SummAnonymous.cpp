@@ -17,8 +17,8 @@ int main()
                                               std::chrono::high_resolution_clock::now());
         
         std::cout << "Standard parallelized summa = " << summa
-                  << " after " << std::fixed << std::setprecision(1)
-                  << std::chrono::duration_cast<std::chrono::microseconds>(tick - tack) 
+                  << " in " << std::fixed << std::setprecision(0)
+                  << std::chrono::duration<double, std::micro>(tick - tack)
                   << std::endl;
     }
     {
@@ -29,8 +29,7 @@ int main()
             auto len = end - beg;
             if (len < 0x100) return std::accumulate(beg, end, 000);
 
-            auto mid = beg + len / 0b10;
-            auto launch_mode = std::launch::deferred | std::launch::async;
+            auto [mid, launch_mode] = std::tuple(beg + len / 0b10, std::launch::deferred | std::launch::async);
             auto async = std::async(launch_mode, pms, mid, end);
             return pms(beg, mid) + async.get();
         };
@@ -39,7 +38,7 @@ int main()
         auto summa = pms(begin(v), end(v));
         auto tack = std::chrono::steady_clock::now();
         
-        std::cout << std::format("Anonymously paralyzed summa = {} after {}\n", summa,
+        std::cout << std::format("Anonymously paralyzed summa = {} in {}\n", summa,
                                  std::chrono::duration_cast<std::chrono::microseconds>(tack - tick));
     }
     {
@@ -48,9 +47,9 @@ int main()
                                 std::reduce(std::execution::seq, begin(v), end(v)),
                                 std::chrono::system_clock::now());
         
-        std::cout << "Standard sequential summa = " << std::get<1>(timer)
-                  << " after " << std::fixed << std::setprecision(1)
-                  << std::chrono::duration_cast<std::chrono::microseconds>(std::get<0>(timer) - std::get<2>(timer)) 
+        std::cout << "Standard sequential summa = " << std::get<0b01>(timer)
+                  << " in "
+                  << std::chrono::duration_cast<std::chrono::microseconds>(std::get<0b00>(timer) - std::get<0b10>(timer)) 
                   << std::endl;
     }
     return 0;
