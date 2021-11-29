@@ -8,6 +8,7 @@ int main()
 {
     // An anonymous and asynchronous (and almost templatized...) 
     // recursive function... 
+    // ... vs the standard library one!
     // A 'pms' acronym stands for 'parallel massive summation'. Yup, really... 
     using T = std::vector<int>::const_iterator;
     auto v = std::vector<int>(0x100'000, 0b01);
@@ -21,13 +22,12 @@ int main()
         auto async = std::async(launch_mode, pms, mid, end);
         return pms(beg, mid) + async.get();
     };
-    // An asynchronous parallel anonymous example recursive invocation 
-    // vs the standard library one...
     {
         auto [tick, summa, tack] = std::tuple(std::chrono::high_resolution_clock::now(), 
-                                              std::reduce(std::execution::par, begin(v), end(v), 000),
+                                              std::reduce(std::execution::par, begin(v), end(v)),
                                               std::chrono::high_resolution_clock::now());
-        std::cout << "Anonymously asynchronous summa = " << summa
+        
+        std::cout << "Standard parallel summa = " << summa
                   << " after " << std::fixed << std::setprecision(1)
                   << std::chrono::duration<double, std::milli>(tick - tack) << "\n";
     }
@@ -35,8 +35,18 @@ int main()
         auto tick = std::chrono::high_resolution_clock::now();
         auto summa = pms(begin(v), end(v));
         auto tack = std::chrono::high_resolution_clock::now();
-        std::cout << std::format("Standard asynchronous summa = {} after {}\n", summa,
+        
+        std::cout << std::format("Anonymously asynchronous summa = {} after {}\n", summa,
                                  std::chrono::duration<double, std::milli>(tack - tick));
+    }
+    {
+        auto [tick, summa, tack] = std::tuple(std::chrono::high_resolution_clock::now(), 
+                                              std::reduce(std::execution::seq, begin(v), end(v)),
+                                              std::chrono::high_resolution_clock::now());
+        
+        std::cout << "Standard sequential summa = " << summa
+                  << " after " << std::fixed << std::setprecision(1)
+                  << std::chrono::duration<double, std::milli>(tick - tack) << "\n";
     }
     return 0;
 }
