@@ -22,7 +22,8 @@ int main()
                   << std::endl;
     }
     {
-        // A 'pms' acronym stands for 'parallel massive summation'. Yup, really... 
+        // A 'pms' acronym stands for 'paralyzed massive summation'. Yup, really... 
+        // https://en.cppreference.com/w/cpp/utility/functional/function
         using T = std::vector<int>::const_iterator;
         std::function<int(T, T)> pms = [&](T beg, T end)
         {

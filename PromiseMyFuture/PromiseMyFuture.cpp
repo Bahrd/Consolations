@@ -184,6 +184,7 @@ int main()
         std::thread reader_I(reader_thread, "Id"),
                     reader_II(reader_thread, "Ego"),
                     reader_III(reader_thread, "Superego");
+        // A writer's thread
         {
             std::lock_guard<std::mutex> lock(m);
             std::cout << "A book to be written by one should be ready to be read by many...\n";

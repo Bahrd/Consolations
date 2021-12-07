@@ -19,10 +19,10 @@ int main()
 
     // Where functions are the first class-citizens...: 
     // https://en.wikipedia.org/wiki/First-class_function    
-    // An anonymous tuple... 
-    auto lambdas = std::tuple([]<typename T>(T i) -> bool        { return 0 == i % 0b10; },
-                              []<typename T>(T i) -> T           { return static_cast<double>(01) / i; },
-                              []<typename T>(T i, char e = '\t') { return std::cout << i << e, static_cast<T>(i); });
+    // A tuple of anonymous items... 
+    auto lambdas = std::tuple([]<typename T>(T i) -> bool             { return 0 == i % 0b10; },
+                              []<typename T>(T i) -> double           { return static_cast<double>(01) / i; },
+                              []<typename T>(T i, char e = '\t') -> T { return std::cout << i << e, static_cast<T>(i); });
     for (auto _ : iota(-11)                    
                 | filter(std::get<0b0>(lambdas)) | transform(std::get<0b1>(lambdas)) | transform(std::get<0b10>(lambdas)) 
                 | take(11)
