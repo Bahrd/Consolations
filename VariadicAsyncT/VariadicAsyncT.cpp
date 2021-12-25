@@ -1,14 +1,10 @@
-﻿// VariadicAsyncT.cpp : Defines the entry point for the application.
-//
-
-#include <numeric>
+﻿#include <numeric>
 #include <functional>
 #include <future>
 #include <iostream>
 #include <numbers>
 #include <ranges>
 #include <string>
-
 /*Programming is one of the most difficult branches of applied mathematics;
   the poorer mathematicians had better remain pure mathematicians."
   Edsger W Dijkstra, "How do we tell truths that might hurt?", 1975

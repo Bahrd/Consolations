@@ -31,7 +31,7 @@ int main()
             // or rather 'to the end of this scope'
             // are now atomic-like...
             auto local_balance = account_balance;
-            std::this_thread::sleep_for(0b1ms);
+            std::this_thread::sleep_for(0b10us);
             local_balance += 1, account_balance = local_balance, ++payments;
 
             std::cout << '+'; // A '«progress» indicator'...
@@ -45,7 +45,7 @@ int main()
             //std::lock_guard<std::mutex> lock(account);
             // Note that the access to the variables in the scope is random...
             auto local_balance = account_balance;
-            std::this_thread::sleep_for(0b1ms);
+            std::this_thread::sleep_for(0b11us);
             local_balance -= 1, account_balance = local_balance, ++withdrawals;
 
             std::cout << '-'; // A '«regress» indicator'...

@@ -5,11 +5,11 @@
 #include <numbers>
 #include <ranges>
 #include <string>
-
 /*Programming is one of the most difficult branches of applied mathematics; 
   the poorer mathematicians had better remain pure mathematicians." 
   Edsger W Dijkstra, "How do we tell truths that might hurt?", 1975
   */
+
 int main()
 {
     using namespace std::placeholders;
@@ -28,8 +28,8 @@ int main()
                 | take(11)
                 );
     // Named tuple/pair...    std::pair(..., ...);
-    auto [twice, writeline] = std::tuple([]<typename T>(T i) -> T { return static_cast<T>(0b10) * i; },
-                                         std::bind(std::get<2>(lambdas), _1, '\n'));
+    auto [twice, writeline] = std::tuple([]<typename T>(T i) -> T     { return static_cast<T>(0b10) * i; },
+                              std::bind(std::get<2>(lambdas), _1, '\n'));
     for (auto _ : std::ranges::istream_view<double>(std::cin)
                 | transform(twice) | transform(writeline)
                 );

@@ -8,3 +8,5 @@ project ("Consolations")
 # Include sub-projects.
 add_subdirectory ("VariadicAsyncT")
 add_subdirectory ("SummAnonymous")
+
+add_subdirectory("AtomicLoopInLoupe")
