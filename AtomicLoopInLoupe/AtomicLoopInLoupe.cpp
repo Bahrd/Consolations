@@ -1,4 +1,9 @@
-﻿#include <format>
+﻿/** A shebang wannabe: for /L %n in (1, 1, 10) do @echo Day #%n in a bank... & @AtomicLoopInLoupe.exe
+ *  Remember: two atoms do not constitute an atom!
+ *  https://youtu.be/ZQFzMfHIxng?t=1374 CppCon 2017: Fedor Pikus “C++ atomics, from basic to advanced.
+                                                                  What do they really do [and don't]?”
+ */
+#include <format>
 #include <iostream>
 #include <atomic>
 #include <string>
@@ -24,7 +29,7 @@ int main()
         // In a bank...
         auto payment = std::thread([&]()
         {
-            while (payments + withdrawals < 0x100)
+            while (payments + withdrawals < 0x100)  // non-atomic!
             {
                 std::this_thread::sleep_for(0b10us);
                 // Atomic operator++
@@ -36,7 +41,7 @@ int main()
         // ... and in a middle of nowhere...
         auto withdrawal = std::thread([&]()
         {
-            while (payments + withdrawals < 0x100)
+            while (payments + withdrawals < 0x100)  // non-atomic!
             {
                 // Atomic --operator
                 --account_balance, ++withdrawals;
@@ -65,7 +70,7 @@ int main()
         auto asking_for_trouble = true;
         auto payment = std::thread([&]()
         {
-            while (payments + withdrawals < 0x100)
+            while (payments + withdrawals < 0x100)          // non-atomic!
             {
                 auto local_balance = account_balance.load();                  
                 std::this_thread::sleep_for(0b10us);
@@ -81,7 +86,7 @@ int main()
         auto keeping_nose_clean = !asking_for_trouble;
         auto withdrawal = std::thread([&]()
         {
-            while (payments + withdrawals < 0x100)
+            while (payments + withdrawals < 0x100)          // non-atomic!
             {
                 auto local_balance = account_balance.load();
                 std::this_thread::sleep_for(0b11us);
