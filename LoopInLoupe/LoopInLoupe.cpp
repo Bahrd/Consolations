@@ -1,9 +1,4 @@
-﻿#include <format>
-#include <iostream>
-#include <mutex>
-#include <string>
-#include <thread>
-
+﻿import std.core;
 /* A account access (i.e. an obnoxiously innocuously lookin') example of
  * how we have gained parallelism at the expense of determinism...
  * http://web.cse.msu.edu/~cse914/Readings/theProblemWithThreads-Computer06.pdf
@@ -12,14 +7,12 @@
  *       [concurrency] comes is... 
  *       [determinism]!".
  */
-
 // CMD: for /L %n in (1, 1, 10) do @echo Day #%n in a bank... & @LoopInLoupe.exe
 int main()
 {
     using namespace std::literals;
     std::mutex account;
     auto account_balance = 0, payments = 0, withdrawals = 0;
-
     // "Once upon a time..."
     // In a bank...
     auto payment = std::thread([&]()
@@ -51,8 +44,7 @@ int main()
             std::cout << '-'; // A '«regress» indicator'...
         }
     });
-    payment.join(); withdrawal.join();
-    
+    payment.join(); withdrawal.join();    
     //  ♫And what have you got at the end of the day?
     //   What have you got to take away?♫
     std::cout << std::format("\nShould be:\t${}.00 (= ${}.00 - ${}.00)", 

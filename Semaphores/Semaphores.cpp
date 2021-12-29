@@ -1,13 +1,5 @@
-#include <atomic>
-#include <condition_variable>
-#include <chrono>
-#include <format>
-#include <future>
-#include <iostream>
-#include <mutex>
-#include <numeric>
-#include <semaphore>
-#include <thread>
+import std.core;
+import std.threading;
 /*
  * "The art of programming is the art of organizing complexity,
  * of mastering multitude and avoiding its bastard chaos as effectively as possible."
@@ -46,7 +38,7 @@ int main()
         first_shift.join(); second_shift.join();
     }
     {
-        //A pair of bona fide semaphores (in action)!
+        //A pair of the bona fide semaphores (in action)!
         std::binary_semaphore green_card(0),
                               invoice(0);
 

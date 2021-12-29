@@ -1,13 +1,5 @@
-﻿#include <atomic>
-#include <condition_variable>
-#include <chrono>
-#include <format>
-#include <future>
-#include <iostream>
-#include <mutex>
-#include <numeric>
-#include <semaphore>
-#include <thread>
+﻿import std.core;
+import std.threading;
 /*
  "[...] computer programming is an art, because it applies accumulated knowledge 
   to the world, because it requires skill and ingenuity, and especially because 
@@ -19,7 +11,7 @@
 using namespace std::literals;
 int main()
 {
-    // An ATOM-ic operation... 
+    // A blocking ATOM-ic operation... 
     // Parmenides: "Only Being exists and [...] Not-Being is not, and can never be"
     {
         auto eleatic_principle = std::atomic_bool(false);
@@ -60,8 +52,8 @@ int main()
                 // and the result is ready to be consumed.
                 // In the stack parlance it is just a return value.
                 int i;
-                std::cin  >> i;
-                promise.set_value("Hello World!");
+                std::cin >> (std::cout << "Any number, please: ", i);
+                promise.set_value(std::format("Hello World No. {}!", i));
             });
 
         // A Consumers' "POP" is here!
@@ -178,7 +170,7 @@ int main()
             std::unique_lock<std::mutex> lock(m);
             cv.wait(lock, [&] { return written; });
             // after the 'wait', we own the lock ♫to the end of [scope]♫
-            std::cout << std::format("{}'s just read the book...", name);
+            std::cout << std::format("{}'s just read the book... ", name);
         };
 
         std::thread reader_I(reader_thread, "Id"),
@@ -193,7 +185,7 @@ int main()
             std::cout << "... right now!\n";
         }
         cv.notify_all();
-        for (auto&& t : { &reader_I, &reader_II, &reader_III}) t->join();
+        for (auto& t : { &reader_I, &reader_II, &reader_III}) t->join();
     }
     return 0;
 }
@@ -207,68 +199,4 @@ then his thought is free, however odd his conclusions may seem.
 — 
 Bertrand Russell, The Value of Free Thought.
 How to Become a Truth-Seeker and Break the Chains of Mental Slavery
- */
-/** OUTAKES:
-     template <typename T>
-     int par_sum(T beg, T end)
-     {
-         auto len = end - beg;
-         if (len < 100) return std::accumulate(beg, end, 0);
-
-         T mid = beg + len / 2;
-         auto handle = std::async(std::launch::async, par_sum<T>, mid, end);
-         int sum = par_sum(beg, mid);
-         return sum + handle.get();
-     };
-     {
-         // using T = std::vector<int>::const_iterator;  // One way...
-         std::vector<int> v(0x1000, 0b1);
-         using T = decltype(begin(v));                   // ... or another.
-         std::function<int(T, T)> pms = [&pms, &v](T a, T b)
-         {
-             auto len = b - a;
-             if (len < 0x100) return std::accumulate(a, b, 0b0);
-
-             auto m = a + len / 0b10;
-             auto handle = std::async(std::launch::async, pms, m, b);
-             auto sum = pms(a, m);
-             return sum + handle.get();
-         };
-         // A parallel recurrence (anonymous and not) example invocation...
-         std::cout << std::format("Are both signed and anonymous sums made equal?\nIs {} == {}?\n",
-             par_sum(begin(v), end(v)),
-             pms(begin(v), end(v)));
-     }
-    {
-        // A account access (i.e. an obnoxiously innocuously lookin') example
-        auto account_balance = 0, payments = 0, withdrawals = 0;
-        std::mutex teller;
-
-        while (payments + withdrawals < 0x100)
-        {
-            // Here, in the bank...
-            auto payment = std::thread([&]()
-                {
-                    std::lock_guard<std::mutex> lock(teller);
-                    // All subsequent operations (to the end of the scope)
-                    // are now atomic-like...
-                    std::this_thread::sleep_for(10ms);
-                    account_balance += 10;
-                    ++payments;
-                });
-            // ... and in the middle of nowhere...
-            auto withdrawal = std::thread([&]()
-                {
-                    std::lock_guard<std::mutex> lock(teller);
-                    // Note that the access to the variables in the
-                    // scope is random...
-                    std::this_thread::sleep_for(10ms);
-                    account_balance -= 10;
-                    ++withdrawals;
-                });
-            payment.join(); withdrawal.join();
-        }
-        std::cout << std::format("Should be:\t${}.00\n", (payments - withdrawals) * 10)
-                  << std::format("Actual balance:\t${}.00\n", account_balance);
-    }
  */
