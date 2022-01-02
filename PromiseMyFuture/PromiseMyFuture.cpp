@@ -9,24 +9,43 @@ import std.threading;
 */
 
 using namespace std::literals;
+
+// https://en.cppreference.com/w/cpp/utility/tuple/tuple
+// helper function to print a tuple of any size
+template<class Tuple, std::size_t N>
+struct tuple_joiner {
+    static void join(Tuple& t)
+    {
+        tuple_joiner<Tuple, N - 1>::join(t);
+        std::get<N - 1>(t).join();
+    }
+};
+template<class Tuple>
+struct tuple_joiner<Tuple, 1> {
+    static void join(Tuple& t)
+    {
+        std::get<0>(t).join();
+    }
+};
+template<class... Args>
+void join_em_all(std::tuple<Args...>& t)
+{
+    tuple_joiner<decltype(t), sizeof...(Args)>::join(t);
+}
+
 int main()
 {
     // A blocking ATOM-ic operation... 
     // Parmenides: "Only Being exists and [...] Not-Being is not, and can never be"
     {
         auto eleatic_principle = std::atomic_bool(false);
-        auto philosopher = std::thread([&]()
+        auto scholar = [&](auto name)
         {
             std::cout << "Waiting...\n";
             eleatic_principle.wait(false);
-            std::cout << std::format("Plato's got: {}\n", eleatic_principle.load());
-        });
-        auto freethinker = std::thread([&]()
-        {
-            std::cout << "Waiting...\n";
-            eleatic_principle.wait(false);
-            std::cout << std::format("Clifford's got: {}\n", eleatic_principle.load());
-        });
+            std::cout << std::format("{}'s got: {}\n", name, eleatic_principle.load());
+        };
+        auto [philosopher, freethinker] = std::pair(std::thread(scholar, "Plato"), std::thread(scholar, "Clifford"));
 
         auto seeker_after_truth = std::thread([&]()
         {
@@ -40,21 +59,22 @@ int main()
         });
         for (auto t : { &philosopher, &freethinker, &seeker_after_truth }) t->join();
     }
+    //Producer and consumers
     {
         // A Producer's "PUSH" that also defines the return value type
         auto promise = std::promise<std::string>();
         auto producer = std::thread([&]
-            {
-                // Here the magic happens (and it should not be too trivial
-                // if one cries concurency for assistance...)
-                // ...
-                // 'set_value' is a signal that the promise is fulfilled 
-                // and the result is ready to be consumed.
-                // In the stack parlance it is just a return value.
-                int i;
-                std::cin >> (std::cout << "Any number, please: ", i);
-                promise.set_value(std::format("Hello World No. {}!", i));
-            });
+        {
+            // Here the magic happens (and it should not be too trivial
+            // if one cries concurency for assistance...)
+            // ...
+            // 'set_value' is a signal that the promise is fulfilled 
+            // and the result is ready to be consumed.
+            // In the stack parlance it is just a return value.
+            int i;
+            std::cin >> (std::cout << "Any number, please: ", i);
+            promise.set_value(std::format("Hello World No. {}!", i));
+        });
 
         // A Consumers' "POP" is here!
         // A single consumer (whoever he|she|they is|are first) 
@@ -62,42 +82,42 @@ int main()
         // By virtue of ♫The winner takes it all!♫ rule, 
         // the other(s) had to leave (exceptionally) empty handed... 
         auto consumer_A = std::thread([&]
+        {
+            try
             {
-                try
-                {
-                    // This consumer is a bit impatient...
-                    std::cout << "I only have about three seconds to spare...\n";
-                    auto future = promise.get_future();
-                    auto result = future.wait_for(3s) == std::future_status::timeout
-                                  ? "Too late, too late..."
-                                  : future.get();
+                // This consumer is a bit impatient...
+                std::cout << "I only have about three seconds to spare...\n";
+                auto future = promise.get_future();
+                auto result = future.wait_for(3s) == std::future_status::timeout
+                                ? "Too late, too late..."
+                                : future.get();
 
-                    std::cout << result << "\n--\nConsumer (an impatient one)!\n";
-                }
-                catch (std::exception& e)
-                {
-                    std::cerr << "Impatient consumer error...: " << e.what() << std::endl;
-                }
-            });
-        auto consumer_B = std::thread([&]
+                std::cout << result << "\n--\nConsumer (an impatient one)!\n";
+            }
+            catch (std::exception& e)
             {
-                try
-                {
-                    // This one has plenty of time on his hands...
-                    std::cout << "'Langsam, aber sicher' is my motto...\n";
-                    auto future = promise.get_future();
-                    std::cout << future.get() << "\n--\nConsumer (a phlegmatic one)!\n";
-                }
-                catch (std::exception& e)
-                {
-                    std::cerr << "Phlegmatic consumer error...: " << e.what() << std::endl;
-                }
-            });
+                std::cerr << "Impatient consumer error...: " << e.what() << std::endl;
+            }
+        });
+        auto consumer_B = std::thread([&]
+        {
+            try
+            {
+                // This one has plenty of time on his hands...
+                std::cout << "'Langsam, aber sicher' is my motto...\n";
+                auto future = promise.get_future();
+                std::cout << future.get() << "\n--\nConsumer (a phlegmatic one)!\n";
+            }
+            catch (std::exception& e)
+            {
+                std::cerr << "Phlegmatic consumer error...: " << e.what() << std::endl;
+            }
+        });
         // A bureaucratic artifact (from Honoré de Balzac to Vercingetorix (a.k.a. Asterix))
         for (auto&& p : { &producer, &consumer_A, &consumer_B}) p->join();
     }
+    // A promise-based binary semaphore...
     {
-        // A binary semaphore...
         auto promise = std::promise<void>();
         auto producer = std::thread([&]
             {
@@ -124,8 +144,8 @@ int main()
         // A bureaucratic artifact II
         producer.join(); consumer.join();
     }
+    //A pair of bona fide semaphores (in action)!
     {
-        //A pair of bona fide semaphores (in action)!
         std::binary_semaphore green_card(0),
                               invoice(0);
 
@@ -158,34 +178,54 @@ int main()
         // A bureaucratic artifact III
         worker.join(); principal.join();
     }
+    // A writer-readers problem
     {
-        // A writer-readers problem
+        // https://en.cppreference.com/w/cpp/thread/condition_variable 
+        // "Even if the shared variable is atomic, it must be modified under the mutex 
+        // in order to correctly publish the modification to the waiting thread."
+        using ulm = std::unique_lock<std::mutex>;
+
         std::mutex m;
         std::condition_variable cv;
-        auto written = false;
+        auto days = 0b1;
 
-        auto reader_thread = [&](std::string const &name)
+        auto reader = [&](std::string const& name)
         {
             // Wait until a writer writes a book...
-            std::unique_lock<std::mutex> lock(m);
-            cv.wait(lock, [&] { return written; });
+            ulm lock(m);
+            cv.wait(lock, [&] { return days > name.size(); });
             // after the 'wait', we own the lock ♫to the end of [scope]♫
-            std::cout << std::format("{}'s just read the book... ", name);
+            std::cout << std::format("{} read the book after {} days ...\n", name, days);
         };
-
-        std::thread reader_I(reader_thread, "Id"),
-                    reader_II(reader_thread, "Ego"),
-                    reader_III(reader_thread, "Superego");
+        //auto readers = std::vector<std::thread>();
+        //for (auto name : { "Id", "Ego", "Superego" })
+        //    readers.push_back(std::move(std::thread(reader, name)));
+        // Or...
+        auto readers = std::make_tuple(std::thread(reader, "Id"), std::thread(reader, "Ego"), std::thread(reader, "Superego"));
         // A writer's thread
         {
-            std::lock_guard<std::mutex> lock(m);
-            std::cout << "A book to be written by one should be ready to be read by many...\n";
-            written = true;
-            std::this_thread::sleep_for(2s);
-            std::cout << "... right now!\n";
+            std::cout << "A book to be days by one should be ready to be read by (not so) many...\n";
+            std::cout << (cv.notify_all(), "... not yet!\n");
+            {
+                ulm lock(m);
+                std::cout << (days += 0b10, cv.notify_all(), "... but now!\n");
+            }
+            std::this_thread::sleep_for(0b1s);
+            {
+                ulm lock(m);
+                std::cout << (days = 010, cv.notify_all(), "... and now again!\n");
+            }
+            std::this_thread::sleep_for(0b1s);
+            {
+                ulm lock(m);
+                std::cout << (days += 0x10, cv.notify_all(), "... and again!\n");
+            }
+            std::this_thread::sleep_for(0b1s);
         }
-        cv.notify_all();
-        for (auto& t : { &reader_I, &reader_II, &reader_III}) t->join();
+        // Dynamic...
+        // for (auto& rt: readers) rt.join();
+        // Static...
+        join_em_all(readers);
     }
     return 0;
 }

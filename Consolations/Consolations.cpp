@@ -15,12 +15,10 @@ int main()
     auto lambdas = std::tuple([](auto i) -> bool        { return !(i & 0b1); },
                               [](auto i)                { return i ? static_cast<double>(01) / i : 0.0; },
                               [](auto i, char e = '\t') { return std::cout << std::format("{:.{}g}{}", i, 0b11, e), i; });
-    
     // Named tuple/pair...  with an explicit template 
     // anonymous function declaration
     auto [twice, writeline] = std::pair([]<typename T>(T i) { return 0b10 * i; },
-                                        std::bind(std::get<0b10>(lambdas), _1, '\n'));
-    
+                                        std::bind(std::get<0b10>(lambdas), _1, '\n'));    
     auto twicer = std::ranges::istream_view<double>(std::cin) | transform(twice);
     std::ranges::copy(twicer, std::ostream_iterator<double>(std::cout, "\n"));
     // Not ready for a prime time yet: 
