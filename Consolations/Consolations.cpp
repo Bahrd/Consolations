@@ -12,15 +12,19 @@ int main()
     // Where functions are the first class-citizens...: 
     // https://en.wikipedia.org/wiki/First-class_function    
     // A tuple of a(uto)nonymous [a.k.a. template-in-auto-disguise] items... 
-    auto lambdas = std::tuple([](auto i) -> bool        { return !(i & 0b1); },
-                              [](auto i)                { return i ? static_cast<double>(01) / i : 0.0; },
-                              [](auto i, char e = '\t') { return std::cout << std::format("{:.{}g}{}", i, 0b11, e), i; });
-    // Named tuple/pair...  with an explicit template 
-    // anonymous function declaration
-    auto [twice, writeline] = std::pair([]<typename T>(T i) { return 0b10 * i; },
-                                        std::bind(std::get<0b10>(lambdas), _1, '\n'));    
-    auto twicer = std::ranges::istream_view<double>(std::cin) | transform(twice);
-    std::ranges::copy(twicer, std::ostream_iterator<double>(std::cout, "\n"));
+    auto lambdas = std::tuple([](auto i) -> bool                     { return !(i & 0b1); },
+                              [](auto i)                             { return i ? static_cast<double>(01) / i : 0.0; },
+                              [](auto i, std::string f = "{:.2g}\t") { return std::format(f, i); });
+    // Named tuple/pair...  with explicit template 
+    // anonymous function declarations (note the famous all-in-one brackets '[]<>(){}' syntax
+    auto [twice, formatter, panta_rhei] = std::tuple([]<typename T>(T i) { return 0b10 * i; },
+                                                     std::bind(std::get<0b10>(lambdas), _1, "{}"),
+                                                     []<typename T>(T s) { return std::cout << s, s; });
+    auto twicer = std::ranges::istream_view<double>(std::cin) | 
+                                             transform(twice) | 
+                                         transform(formatter) | 
+                                         transform(panta_rhei);
+    for (auto _ : twicer);
     // Not ready for a prime time yet: 
     // 'std::ranges::ostream_iterator<double>(std::cout, "\n")'
     // See e.g.: http://ericniebler.github.io/range-v3/index.html and https://cxx20ranges.brcha.com/#/5/19
@@ -32,8 +36,7 @@ int main()
                    transform(std::get<0b1>(lambdas)) | 
                    transform(std::get<0b10>(lambdas))| 
                    take(11);
-    // ... and execute it 
-    //     (somehow)!
-    for(auto _ : lambada);
+    // ... "you cannot step twice into the same stream"...
+    std::ranges::copy(lambada, std::ostream_iterator<std::string>(std::cout, ""));
     return 0;
 }

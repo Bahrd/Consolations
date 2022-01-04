@@ -18,9 +18,6 @@ auto& operator <<(std::basic_ostream<Ch, Tr>& os, const std::tuple<Args...>& t)
 }
 
 int main()
-{
-    auto tup_tuple = std::make_tuple(1, '1', "1", 1.0, true, 
-                     std::make_tuple(0, '0', "0", 0.0, false));
-    
-    return std::cout << tup_tuple, 0;
+{    
+    return std::cout << std::tuple{ 1, '1', "1", 1.0, true, std::tuple{ 0, '0', "0", 0.0, false} }, 0;
 }
