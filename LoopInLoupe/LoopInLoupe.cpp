@@ -7,7 +7,6 @@
  *       [concurrency] comes is... 
  *       [determinism]!".
  */
-// CMD: for /L %n in (1, 1, 10) do @echo Day #%n in a bank... & @LoopInLoupe.exe
 int main()
 {
     using namespace std::literals;
@@ -52,3 +51,13 @@ int main()
               << std::format("\nActual balance:\t${}.00\n", account_balance);
     return 0;
 }
+/*  CMD's command-line: 
+for /L %n in (1, 1, 10) do @echo Day #%n in a bank... & @LoopInLoupe.exe
+    
+    PS's  command-(multi)line:
+for($i = 1; $i -le 10; $i++)`
+{`
+    $balanceHistory = Invoke-Expression .\LoopInLoupe | Out-String;`
+    Write-Host "Day #${i} in a bank...`n`r ${balanceHistory}";`
+}
+*/
