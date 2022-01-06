@@ -64,38 +64,37 @@ int main()
         using namespace std::literals;
         auto account_balance = std::atomic(0);
         auto [payments, withdrawals] = std::tuple(0, 0);
-
         // "Once upon a time..."
         // In a bank...
-        auto asking_for_trouble = true;
+        static const auto asking_for_trouble = !false;
         auto payment = std::thread([&]()
         {
-            while (payments + withdrawals < 0x100)          // non-atomic!
+            while (payments + withdrawals < 0x100)              // non-atomic!
             {
                 auto local_balance = account_balance.load();                  
                 std::this_thread::sleep_for(0b10us);
-                if(asking_for_trouble)                      // Monte Carlo ain't a panaceum!
+                if constexpr (asking_for_trouble)               // Monte Carlo ain't a panaceum!
                     account_balance = local_balance + 0b1; 
-                else                                        // Keeping ourselves out of trouble!
+                else                                            // Keeping ourselves out of trouble!
                     while (!account_balance.compare_exchange_strong(local_balance, local_balance + 1)); 
                                                         
-                std::cout << (++payments, '+');             // A '«progress» indicator'...
+                std::cout << (++payments, '+');                 // A '«progress» indicator'...
             }
         });
         // ... and in a middle of nowhere...
-        auto keeping_nose_clean = !asking_for_trouble;
+        static constexpr auto keeping_nose_clean = !asking_for_trouble;
         auto withdrawal = std::thread([&]()
         {
-            while (payments + withdrawals < 0x100)          // non-atomic!
+            while (payments + withdrawals < 0x100)              // non-atomic!
             {
                 auto local_balance = account_balance.load();
                 std::this_thread::sleep_for(0b11us);
-                if(keeping_nose_clean)                      // ... and the hands too!
+                if constexpr (keeping_nose_clean)               // ... and the hands too!
                     while (!account_balance.compare_exchange_strong(local_balance, local_balance - 1)); 
                 else
-                    account_balance = local_balance - 0b1;  // Looking for trouble!
+                    account_balance = local_balance - 0b1;      // Looking for trouble!
                 
-                std::cout << (++withdrawals, '-');          // A '«regress» indicator'...
+                std::cout << (++withdrawals, '-');              // A '«regress» indicator'...
             }
         });
         payment.join(); withdrawal.join();
@@ -106,4 +105,14 @@ int main()
                   << std::format("\nActual balance:\t${}.00\n", account_balance.load());
     }
     return 0;
-}   // CMD: for /L %n in (1, 1, 10) do @echo Day #%n in a bank... & @AtomicLoopInLoupe.exe
+}   
+/*  CMD's command-line: 
+for /L %n in (1, 1, 10) do @echo Day #%n in a bank... & @AtomicLoopInLoupe.exe
+    
+    PS's  command-(multi)line:
+for($i = 1; $i -le 10; $i++)`
+{`
+    $balanceHistory = Invoke-Expression .\AtomicLoopInLoupe | Out-String;`
+    Write-Host "Day #${i} in a bank...`n`r ${balanceHistory}";`
+}
+*/

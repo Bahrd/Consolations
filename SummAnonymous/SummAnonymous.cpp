@@ -30,7 +30,7 @@ int main()
             auto len = end - beg;
             if (len < 0x100) return std::accumulate(beg, end, 000);
 
-            auto [mid, launch_mode] = std::tuple(beg + len / 0b10, std::launch::deferred | std::launch::async);
+            auto [launch_mode, mid] = std::pair(std::launch::deferred | std::launch::async, beg + len / 0b10);
             auto async = std::async(launch_mode, pms, mid, end);
             return pms(beg, mid) + async.get();
         };
