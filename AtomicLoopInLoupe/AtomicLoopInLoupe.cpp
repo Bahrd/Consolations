@@ -69,10 +69,12 @@ int main()
         static const auto asking_for_trouble = !false;
         auto payment = std::thread([&]()
         {
+            [[likely]]
             while (payments + withdrawals < 0x100)              // non-atomic!
             {
                 auto local_balance = account_balance.load();                  
                 std::this_thread::sleep_for(0b10us);
+                [[likely]]
                 if constexpr (asking_for_trouble)               // Monte Carlo ain't a panaceum!
                     account_balance = local_balance + 0b1; 
                 else                                            // Keeping ourselves out of trouble!
@@ -85,10 +87,12 @@ int main()
         static constexpr auto keeping_nose_clean = !asking_for_trouble;
         auto withdrawal = std::thread([&]()
         {
+            [[likely]]
             while (payments + withdrawals < 0x100)              // non-atomic!
             {
                 auto local_balance = account_balance.load();
                 std::this_thread::sleep_for(0b11us);
+                [[unlikely]] 
                 if constexpr (keeping_nose_clean)               // ... and the hands too!
                     while (!account_balance.compare_exchange_strong(local_balance, local_balance - 1)); 
                 else
@@ -106,10 +110,11 @@ int main()
     }
     return 0;
 }   
-/*  CMD's command-line: 
-for /L %n in (1, 1, 10) do @echo Day #%n in a bank... & @AtomicLoopInLoupe.exe
-    
-    PS's  command-(multi)line:
+/*  A pair of CMD's and PS's command-lines: 
+for /L %i in (1, 1, 10)      do @echo Day #%i in a bank...         & @AtomicLoopInLoupe.exe
+for($i = 1; $i -le 10; $i++) {Write-Host "Day #${i} in a bank..."; &.\AtomicLoopInLoupe.exe;}
+
+or... the PS's command-multiline:
 for($i = 1; $i -le 10; $i++)`
 {`
     $balanceHistory = Invoke-Expression .\AtomicLoopInLoupe | Out-String;`
