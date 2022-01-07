@@ -5,30 +5,30 @@
 #include <vector>
 
 // https://en.cppreference.com/w/cpp/thread/barrier
+// chcp 65001 - to see notes in a terminal!
 int main() 
 {
-    const auto state_abrevs = { "AZ", "NV", "UT", "ID", "WY", "CO"};
-    auto phase = "... Route planned!\n" "Hitting the road...\n";
-
-    std::barrier sync_point(std::ssize(state_abrevs), [&phase]() noexcept
+    const auto itinerary = { "AZ", "NV", "UT", "ID", "WY", "CO" };
+    auto phase = "♫ ... when the ⅄⅃LY breaks!\n" "♫ Wherever I may roam!\n";
+    std::barrier sync_point(std::ssize(itinerary), [&phase]() noexcept
     {
         std::cout << phase;
         phase = "... back home!\n";
     });
 
-    auto pass = [&](std::string state_name) 
+    auto pass = [&](std::string state_name)
     {
-        std::string itinerary = "  " + state_name + " allowed\n";
-        std::cout << itinerary; 
+        std::string itinerary_report = "♫ Ramble on, " + state_name + "!\n";
+        std::cout << itinerary_report;
         sync_point.arrive_and_wait();
 
-        itinerary = "  " + state_name + " visited\n";
-        std::cout << itinerary;
+        itinerary_report = "♫ Turn the " + state_name + " page...\n";
+        std::cout << itinerary_report;
         sync_point.arrive_and_wait();
     };
 
     std::cout << "Planning...\n";
     std::vector<std::jthread> threads;
-    for (auto const& state_abrev : state_abrevs) 
-        threads.emplace_back(pass, state_abrev);
+    for (auto const& itinerary_item : itinerary)
+        threads.emplace_back(pass, itinerary_item);
 }
