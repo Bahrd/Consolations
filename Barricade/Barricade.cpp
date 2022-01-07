@@ -9,7 +9,7 @@
 int main() 
 {
     const auto itinerary = { "AZ", "NV", "UT", "ID", "WY", "CO" };
-    auto phase = "♫ ... when the ⅄⅃LY breaks!\n" "♫ Wherever I may roam!\n";
+    auto phase = "♫ ... when the ⅄⅃LY breaks!\n" "Wherever I may roam! ♫\n";
     std::barrier sync_point(std::ssize(itinerary), [&phase]() noexcept
     {
         std::cout << phase;
@@ -22,13 +22,12 @@ int main()
         std::cout << itinerary_report;
         sync_point.arrive_and_wait();
 
-        itinerary_report = "♫ Turn the " + state_name + " page...\n";
+        itinerary_report = "@" + state_name + " Turn the page...♫\n";
         std::cout << itinerary_report;
         sync_point.arrive_and_wait();
     };
 
-    std::cout << "Planning...\n";
+    std::cout << "[Aqua-]planning...\n";
     std::vector<std::jthread> threads;
-    for (auto const& itinerary_item : itinerary)
-        threads.emplace_back(pass, itinerary_item);
+    for (auto const& itinerary_item : itinerary) threads.emplace_back(pass, itinerary_item);
 }
