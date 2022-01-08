@@ -14,7 +14,7 @@ struct tt_profile
     std::string const name;
     std::string status{"Assigned"};
     std::thread action{};
-} 
+}
 dream_team[] = {{"Fabian Cancellara"}, 
                 {"Filippo Ganna"}, 
                 {"Tony Martin"}};
