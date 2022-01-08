@@ -30,4 +30,6 @@ int main()
     std::cout << "[Aqua-]planning...\n";
     std::vector<std::jthread> threads;
     for (auto const& itinerary_item : itinerary) threads.emplace_back(pass, itinerary_item);
+
+    return 0;
 }
