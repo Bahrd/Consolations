@@ -24,20 +24,20 @@ struct first_arg_t { using T = TT; };
 template <typename... T>
 concept additive = requires(T... t)
 {
-    (... + t);
+    (... + t) + (t + ...);
     requires sizeof...(T) > 1;
 };
 
 template <typename... T> requires additive<T...>
-first_arg_t<T...>::T add(T&& ...t)
+constexpr first_arg_t<T...>::T add_twice(T&& const ...t)
 {
-    return (... + t);
+    return (... + t) + (t + ...);
 }
 
 int main()
 {    
     std::cout << std::boolalpha   << std::tuple{ 1, '1', "1", std::tuple{ 1.0, true  }} << std::endl
               << std::noboolalpha << std::tuple{ 0, "0", '0', std::tuple{ 0.0, false }} << std::endl
-              << std::hex << std::showbase << add(1, 2, 3, 4, 5);
+              << std::bitset<8>{add_twice(0b1, 0b10, 0b11, 0x10, 010)};
     return 0;
 }
