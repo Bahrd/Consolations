@@ -18,26 +18,26 @@ auto& operator <<(std::basic_ostream<Ch, Tr>& os, const std::tuple<Args...>& t)
 }
 
 // https://youtu.be/_FoXWnrGuNU?t=640 
-template <typename TT, typename...>
-struct first_arg_t { using T = TT; };
+template <typename _T, typename...>
+struct first_arg_t { using T = _T; };
 
 template <typename... T>
-concept additive = requires(T... t)
+concept commutative_addition = requires(T... t)
 {
-    (... + t) + (t + ...);
+    (... + t) <=> (t + ...);
     requires sizeof...(T) > 1;
 };
 
-template <typename... T> requires additive<T...>
-constexpr first_arg_t<T...>::T add_twice(T&& const ...t)
+template <typename... T> requires commutative_addition <T...>
+constexpr first_arg_t<T...>::T add(T&& ...t)
 {
-    return (... + t) + (t + ...);
+    return (... + t);
 }
 
 int main()
 {    
-    std::cout << std::boolalpha   << std::tuple{ 1, '1', "1", std::tuple{ 1.0, true  }} << std::endl
-              << std::noboolalpha << std::tuple{ 0, "0", '0', std::tuple{ 0.0, false }} << std::endl
-              << std::bitset<8>{add_twice(0b1, 0b10, 0b11, 0x10, 010)};
+    std::cout << std::noboolalpha << std::tuple{ 1, '1', "1", std::tuple{ 1.0, true  }} << std::endl
+              << std::boolalpha   << std::tuple{ 0, "0", '0', std::tuple{ 0.0, false }} << std::endl
+              << std::bitset<0b111>{add(0b1, 0b10, 0111, 0x10, 0x1)};
     return 0;
 }
