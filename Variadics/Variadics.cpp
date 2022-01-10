@@ -24,7 +24,7 @@ struct first_arg_t { using T = _T; };
 template <typename... T>
 concept commutative_addition = requires(T... t)
 {
-    (... + t) <=> (t + ...);
+    (... + t) == (t + ...); // A dubious requirement... syntax says (almost) nothing about semantics...
     requires sizeof...(T) > 1;
 };
 
