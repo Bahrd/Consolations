@@ -29,9 +29,23 @@ concept commutative_addition = requires(T... t)
 };
 
 template <typename... T> requires commutative_addition <T...>
-constexpr first_arg_t<T...>::T add(T&& ...t)
+consteval first_arg_t<T...>::T add(T&& ...t)
 {
     return (... + t);
+}
+
+// https://en.cppreference.com/w/cpp/language/parameter_pack - a lecture... ;)
+template<class... Args>
+void g(Args... args)
+{
+    f(const_cast<const Args*>(&args)...);
+    // const_cast<const Args*>(&args) is the pattern, it expands two packs
+    // (Args and args) simultaneously
+
+    f(h(args...) + args...); // Nested pack expansion:
+    // inner pack expansion is "args...", it is expanded first
+    // outer pack expansion is h(E1, E2, E3) + args..., it is expanded
+    // second (as h(E1, E2, E3) + E1, h(E1, E2, E3) + E2, h(E1, E2, E3) + E3)
 }
 
 int main()

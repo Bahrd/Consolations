@@ -20,6 +20,7 @@ int main()
     auto [twice, formatter, panta_rhei] = std::tuple([]<typename T>(T i) { return 0b10 * i; },
                                                      std::bind(std::get<0b10>(lambdas), _1, "{}"),
                                                      []<typename T>(T s) { return std::cout << s, s; });
+    // https://youtu.be/j9tlJAqMV7U?t=469 - a composite pipeline that can reduce to a single assembler code line
     auto twicer = std::ranges::istream_view<double>(std::cin) | 
                                              transform(twice) | 
                                          transform(formatter) | 

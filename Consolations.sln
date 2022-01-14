@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Semaphores", "Semaphores\Se
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Variadics", "Variadics\Variadics.vcxproj", "{D365A59C-77C4-405D-B9C6-C9AADCB57681}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConCoroutine", "ConCoroutine\ConCoroutine.csproj", "{17CAE829-3A5B-4248-8DF7-C3FDB0339678}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,18 @@ Global
 		{D365A59C-77C4-405D-B9C6-C9AADCB57681}.Release|x64.Build.0 = Release|x64
 		{D365A59C-77C4-405D-B9C6-C9AADCB57681}.Release|x86.ActiveCfg = Release|Win32
 		{D365A59C-77C4-405D-B9C6-C9AADCB57681}.Release|x86.Build.0 = Release|Win32
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Debug|x64.Build.0 = Debug|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Debug|x86.Build.0 = Debug|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|x64.ActiveCfg = Release|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|x64.Build.0 = Release|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|x86.ActiveCfg = Release|Any CPU
+		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
