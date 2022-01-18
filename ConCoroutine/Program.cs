@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.IO;
 
 /// Coroutines - generators and servers...
 /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/yield#examples
@@ -12,23 +11,42 @@ namespace ConCoroutine
         static void Main()
         {
             var (AllAboutThatBase, TheExpo) = (0x2, 0x8);                   
+            
             // Coroutines...
             foreach (var n in LazyPower(AllAboutThatBase, TheExpo))
                 Console.Write("{0:x}\t", n);
             Console.WriteLine();
+            
+            // Coroutines and PLINQ... 
+            foreach (var n in NotSoLazyGenerator(Stop: TheExpo)
+                              .AsParallel()
+                              .WithDegreeOfParallelism(0x8)
+                              .WithExecutionMode(ParallelExecutionMode.ForceParallelism)
+                              .OrderByDescending(n => n)
+                              .Select(n => AgilePower(AllAboutThatBase, n)))
+                Console.Write("{0:x}\t", n);
+            Console.WriteLine();
+            
+            // In old-C style...
+            for (var n = 0x0; n < TheExpo; ++n)
+                Console.Write("{0:x}\t", 0x1 << n);
+            Console.WriteLine();
+            
             // Coroutines and LINQ... Take I
+            foreach (var n in from m in NotSoLazyGenerator(TheExpo)
+                              orderby m ascending
+                              select AgilePower(AllAboutThatBase, m))
+                Console.Write("{0:x}\t", n);
+            Console.WriteLine();
+            
+            // Coroutines and LINQ... Take II
             foreach (var n in NotSoLazyGenerator(Stop: TheExpo)
                               .OrderByDescending(n => n)
                               .Select(n => AgilePower(AllAboutThatBase, n)))
                 Console.Write("{0:x}\t", n);
             Console.WriteLine();
-            // Coroutines and LINQ... Take II
-            foreach (var n in from m in NotSoLazyGenerator(TheExpo) 
-                              orderby -m ascending 
-                              select AgilePower(AllAboutThatBase, m))
-                Console.Write("{0:x}\t", n);
-            Console.WriteLine();
-            // Neither coroutines nor LINQ...
+            
+            // Neither coroutines nor (P)LINQ...
             for (var n = 0x0; n < TheExpo; ++n)
                 Console.Write("{0:x}\t", AgilePower(AllAboutThatBase, n));
             Console.WriteLine();
