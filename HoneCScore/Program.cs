@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace HoneCScore
 {
-    /// <summary>
+    /// <sources>
     ///  See: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/index
     ///       https://en.wikipedia.org/wiki/Carolina_Reaper
     ///       https://en.wikipedia.org/wiki/Reversible_cerebral_vasoconstriction_syndrome
-    /// </summary>
+    /// </sources>
     class Program
     {
         static readonly Func<int, Task<int>> λ = async (ξ) => 
@@ -39,9 +39,9 @@ namespace HoneCScore
             ϑs.AddRange(JsonSerializer.Deserialize<List<string>>($"[{pepper.Item1}, {pepper.Item2}]"));
 
             Console.OutputEncoding = Encoding.UTF8;
-            Console.WriteLine($"A JSON's ϑ-breakfast recipe: {json}");
+            Console.WriteLine($"A JSON's ϑ-breakfast toppings: {json}");
             foreach (var ϑ in ϑs)
-                Console.WriteLine($"The re-JetiSONed ϑ-values: {ϑ}");
+                Console.WriteLine($"The re-JetiSONed ϑ-topping: {ϑ}");
             Console.WriteLine($"Preparing a ϑ-breakfast... at {DateTime.Now} with safety glasses and gloves");
 
             var ϑα = Tastyϑ(6); var ϑω = Tastyϑ(4);
