@@ -1,15 +1,17 @@
 ﻿#include <vector>
+#include <format>
 #include <functional>
 #include <numeric>
 #include <execution>
 #include <future>
 #include <iostream>
+#include <iomanip>
 // An anonymous and asynchronous (and almost templatized...) 
 // recursive function... 
 // ... vs the standard library veterans!
 int main()
 {
-    auto v = std::vector<int>(0x10'000, 0b01);
+    auto v = std::vector<int>(0x10'000'00, 0b01);
     {
         // A bling-bling flavour of the standard library routine...
         auto [tick, summa, tack] = std::tuple(std::chrono::high_resolution_clock::now(),
