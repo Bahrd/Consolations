@@ -117,6 +117,7 @@ int main()
         for (auto&& p : { &producer, &consumer_A, &consumer_B}) p->join();
     }
     // A promise-based binary semaphore...
+    // cf. also https://en.cppreference.com/w/cpp/thread/future
     {
         auto promise = std::promise<void>();
         auto producer = std::jthread([&]

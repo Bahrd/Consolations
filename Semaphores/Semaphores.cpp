@@ -12,7 +12,7 @@ int main()
     {
         // A binary semaphore...
         auto promise = std::promise<void>();
-        auto first_shift = std::thread([&]
+        auto first_shift = std::jthread([&]
         {
             std::cout << "[Our shift] starts...\n";
             std::this_thread::sleep_for(1s);
@@ -20,7 +20,7 @@ int main()
             // There is a kind of a mutual exclusion area here...
             promise.set_value();
         });
-        auto second_shift = std::thread([&]
+        auto second_shift = std::jthread([&]
         {
             try
             {
@@ -34,8 +34,6 @@ int main()
                 std::cerr << "[New shift] an error occured: " << e.what() << std::endl;
             }
         });
-        // A bureaucratic artifact No. I++
-        first_shift.join(); second_shift.join();
     }
     {
         //A pair of the bona fide semaphores (in action)!
@@ -43,7 +41,7 @@ int main()
                               invoice(0);
 
         // A worker is going to work hard(ly?)...
-        auto worker = std::thread([&]()
+        auto worker = std::jthread([&green_card, &invoice]()
         {
             // ... and thus (badly) needs a permission from his principal...
             green_card.acquire();
@@ -56,8 +54,8 @@ int main()
             invoice.release();
         });
 
-        // A principle is going to watch...
-        auto principal = std::thread([&]()
+        // A principal's principle is to watch...
+        auto principal = std::jthread([&green_card, &invoice]()
         {
             // A principal sends a "Ready! Set! Go!" message
             std::cout << "[Principal] Do your job!\n";
@@ -67,9 +65,6 @@ int main()
             invoice.acquire();
             std::cout << "[Principal] Here's your cheque!\n"; // ... no double-check, huh?!
         });
-
-        // A bureaucratic artifact No. I++
-        worker.join(); principal.join();
     }
     return 0;
 }

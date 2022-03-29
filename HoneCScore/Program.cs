@@ -71,7 +71,7 @@ namespace HoneCScore
             // Marsellus: Yeah, we cool. Two things. Don't tell nobody about this. [...]
             //            Two: you leave town tonight, right now.
             //            And when you're gone, you stay gone, or you be gone.
-            //            You lost all your L.A.privileges.
+            //            You lost all your L.A. privileges.
             //            Deal ?
             Console.WriteLine($"The double-ϑ-burger makeweight is ready at {DateTime.Now}, too!");
         }

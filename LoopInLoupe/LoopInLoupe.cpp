@@ -6,6 +6,7 @@
  *      "The first casualty when 
  *       [concurrency] comes is... 
  *       [determinism]!".
+ * BTW: https://www.eenewseurope.com/en/c-heap-manager-provides-real-time-deterministic-performance/
  */
 int main()
 {
