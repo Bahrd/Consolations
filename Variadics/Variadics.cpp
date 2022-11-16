@@ -1,4 +1,5 @@
 import std.core;
+import std.threading;
 
 // https://en.cppreference.com/w/cpp/utility/integer_sequence
 // Pretty-Print a Tuple 
@@ -6,7 +7,8 @@ template<class Ch, class Tr, class Tuple, std::size_t... Is>
 void type_tuple(std::basic_ostream<Ch, Tr>& os, const Tuple& t, std::index_sequence<Is...>)
 {
     // A remarkably ultra-hiper-super notable extra-smart use of 
-    // 'operators << ()' (pre-)defined for all standard C++ types as recurrence stops...
+    // 'operators << ()' (pre-)defined for all standard C++ types as the recurrence stops...
+    // Note further that tuples can be embedded! It's a recursion after all!
     ((os << (Is == 0 ? "" : ", ") << std::get<Is>(t)), ...);
 }
 
