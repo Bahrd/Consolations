@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-
+using System.Diagnostics;
 /// Coroutines - generators and servers...
 /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/yield#examples
 namespace ConCoroutine
@@ -10,6 +10,9 @@ namespace ConCoroutine
     {
         static void Main()
         {
+            foreach (var n in NotSoLazyGenerator(Stop: -2, Start: 0, Step:-3))
+                Console.Write("{0:x}\t", n);
+
             var (AllAboutThatBase, TheExpo) = (0x2, 0x8);                   
             
             // Coroutines...
@@ -53,6 +56,11 @@ namespace ConCoroutine
         }
         public static SCGI NotSoLazyGenerator(int Stop, int Start = 0x0, int Step = 0x1)
         {
+            // Are we sure '!=' is okay?
+            Console.WriteLine(Math.Sign(Stop - Start));
+            Console.WriteLine(Math.Sign(Step));
+            Debug.Assert(Math.Sign(Stop - Start) == Math.Sign(Step), "Ain't gonna end...");
+            Debug.Assert(unchecked(((Stop - Start)/(double)Step) == (Stop - Start)/Step), "Ain't really gonna end...");
             for (var n = Start; n != Stop; n += Step)
                 yield return n;
         }
@@ -68,3 +76,6 @@ namespace ConCoroutine
         }
     }
 }
+/**
+ * dotnet run --no-build
+ */

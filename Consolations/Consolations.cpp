@@ -6,9 +6,10 @@ import std.core;
 import std.threading;
 int main()
 {
-    using std::views::iota, 
-          std::views::filter, std::views::transform, 
-          std::views::take;
+    //using std::views::iota, 
+    //      std::views::filter, std::views::transform, 
+    //      std::views::take;
+    using namespace std::views;
     using std::placeholders::_1, std::bind;
     using std::string, std::vformat, std::make_format_args,
           std::cin, std::cout, 
