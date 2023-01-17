@@ -10,9 +10,6 @@ namespace ConCoroutine
     {
         static void Main()
         {
-            foreach (var n in NotSoLazyGenerator(Stop: -2, Start: 0, Step:-3))
-                Console.Write("{0:x}\t", n);
-
             var (AllAboutThatBase, TheExpo) = (0x2, 0x8);                   
             
             // Coroutines...
@@ -56,9 +53,7 @@ namespace ConCoroutine
         }
         public static SCGI NotSoLazyGenerator(int Stop, int Start = 0x0, int Step = 0x1)
         {
-            // Are we sure '!=' is okay?
-            Console.WriteLine(Math.Sign(Stop - Start));
-            Console.WriteLine(Math.Sign(Step));
+            // Are we sure '!=' is a bullet-proof stopping condition?
             Debug.Assert(Math.Sign(Stop - Start) == Math.Sign(Step), "Ain't gonna end...");
             Debug.Assert(unchecked(((Stop - Start)/(double)Step) == (Stop - Start)/Step), "Ain't really gonna end...");
             for (var n = Start; n != Stop; n += Step)
@@ -71,11 +66,14 @@ namespace ConCoroutine
         }
         public static int AgilePower(int Base, int Expo)
         {
-            var (n, result) = (0x0, 0x1); for (; n < Expo; result *= Base, n++);
-            return result;
+            var (n, result) = (0x0, 0x1); 
+            for (; n < Expo; result *= Base, n++);
+                return result;
         }
     }
+    // https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/yield
 }
 /**
+ * cd .\Consolations\ConCoroutine\
  * dotnet run --no-build
  */

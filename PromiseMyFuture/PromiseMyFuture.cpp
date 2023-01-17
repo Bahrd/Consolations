@@ -162,7 +162,7 @@ int main()
             std::cout << "[Worker] Job's done!\n";
             invoice.release();
         });
-        // A principle is going to watch...
+        // A principal is going to watch...
         auto principal = std::jthread([&]()
         {
             // A principal sends a "Ready! Set! Go!" message
@@ -204,7 +204,7 @@ int main()
                                        std::thread(reader, "Superego"));
         // A writer's thread
         {
-            std::cout << "A book to be days by one should be ready to be read by (not so) many...\n";
+            std::cout << "A book to be written by one should be ready to be read by (not so) many...\n";
             std::cout << (cv.notify_all(), "... not yet!\n");
             {
                 ulm lock(m);

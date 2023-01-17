@@ -11,6 +11,8 @@
 // ... vs the standard library veterans!
 int main()
 {
+    using millisec_t = std::chrono::duration<double, std::milli>;
+
     auto v = std::vector<int>(0x10'000'00, 0b01);
     {
         // A bling-bling flavour of the standard library routine...
@@ -20,8 +22,8 @@ int main()
         
         std::cout << "Standard parallelized summa = " << summa
                   << " in " << std::fixed << std::setprecision(0)
-                  << std::chrono::duration<double, std::micro>(tick - tack)
-                  << std::endl;
+                  << millisec_t(tick - tack).count()
+                  << "ms\n";
     }
     {
         // A 'pms' acronym stands for 'paralyzed massive summation'. Yup, really... 
@@ -41,19 +43,20 @@ int main()
         auto summa = pms(begin(v), end(v));
         auto tack = std::chrono::steady_clock::now();
         
-        std::cout << std::format("Anonymously paralyzed summa = {} in {}\n", summa,
-                                 std::chrono::duration_cast<std::chrono::microseconds>(tack - tick));
+        std::cout << std::format("Anonymously paralyzed summa = {} in {}ms\n", summa,
+                                 millisec_t(tack - tick).count());
     }
     {
         // Just a standard library routine...
+        // (Are the tuple's elements initialized in order of they appearance?)
         auto timer = std::tuple(std::chrono::system_clock::now(), 
                                 std::reduce(std::execution::seq, begin(v), end(v)),
                                 std::chrono::system_clock::now());
         
         std::cout << "Standard sequential summa = " << std::get<0b01>(timer)
                   << " in "
-                  << std::chrono::duration_cast<std::chrono::microseconds>(std::get<0b00>(timer) - std::get<0b10>(timer)) 
-                  << std::endl;
+                  << millisec_t(std::get<0b00>(timer) - std::get<0b10>(timer)).count()
+                  << "ms\n";
     }
     return 0;
 }

@@ -7,6 +7,7 @@ project ("Consolations")
 
 # Include sub-projects.
 add_subdirectory ("VariadicAsyncT")
+add_subdirectory ("MetaTemplates")
 add_subdirectory ("SummAnonymous")
 add_subdirectory("Barricade")
 add_subdirectory("CClatchCC")

@@ -3,9 +3,9 @@
  *  https://youtu.be/ZQFzMfHIxng?t=1374 CppCon 2017: Fedor Pikus “C++ atomics, from basic to advanced.
                                                                   What do they really do [and don't]?”
  */
+#include <atomic>
 #include <format>
 #include <iostream>
-#include <atomic>
 #include <string>
 #include <thread>
 /* A account access (i.e. an obnoxiously innocuously lookin') example of
@@ -66,14 +66,18 @@ int main()
         auto [payments, withdrawals] = std::tuple(0, 0);
         // "Once upon a time..."
         // In a bank...
-        static const auto asking_for_trouble = !false;
+        static constexpr auto asking_for_trouble = !false;
+
         auto payment = std::thread([&]()
         {
             [[likely]]
             while (payments + withdrawals < 0x100)              // non-atomic!
             {
                 auto local_balance = account_balance.load();                  
-                std::this_thread::sleep_for(0b10us);
+                //if constexpr (!asking_for_trouble)
+                {
+                   std::this_thread::sleep_for(0b11ms);          // Can be to fast to see the problem...
+                }
                 [[likely]]
                 if constexpr (asking_for_trouble)               // Monte Carlo ain't a panaceum!
                     account_balance = local_balance + 0b1; 
@@ -85,13 +89,17 @@ int main()
         });
         // ... and in a middle of nowhere...
         static constexpr auto keeping_nose_clean = !asking_for_trouble;
+
         auto withdrawal = std::thread([&]()
         {
             [[likely]]
-            while (payments + withdrawals < 0x100)              // non-atomic!
-            {
+            while (payments + withdrawals < 0x100)              // non-atomic! 
+            {                                                  
                 auto local_balance = account_balance.load();
-                std::this_thread::sleep_for(0b11us);
+                //if constexpr (keeping_nose_clean)
+                {
+                    std::this_thread::sleep_for(0b100ms);
+                }
                 [[unlikely]] 
                 if constexpr (keeping_nose_clean)               // ... and the hands too!
                     while (!account_balance.compare_exchange_strong(local_balance, local_balance - 1)); 

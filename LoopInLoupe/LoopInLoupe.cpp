@@ -5,6 +5,7 @@ import std.threading;
  * how we have gained parallelism at the expense of determinism...
  * A.k.a. banking debunking...
  * http://web.cse.msu.edu/~cse914/Readings/theProblemWithThreads-Computer06.pdf
+ * https://en.cppreference.com/w/cpp/language/memory_model#Threads_and_data_races
  * Hiram Johnson would have said:
  *      "The first casualty when
  *       [concurrency] comes is...
@@ -110,7 +111,7 @@ int main()
         auto [payments, withdrawals] = std::tuple(0, 0);
         // "Once upon a time..."
         // In a bank...
-        static const auto asking_for_trouble = !false;
+        static const auto asking_for_trouble = false;
         auto payment = std::thread([&]()
         {
             [[likely]]
@@ -155,8 +156,8 @@ int main()
     return 0;
 }
 /*  PS's and CMD's command-line[s]:
+for($i = 1; $i -le 10; $i++) {Write-Host "Day #${i} in a bank..."; &.\LoopInLoupe.exe;}
 for /L %n in (1, 1, 10) do @echo Day #%n in a bank... & @LoopInLoupe.exe
-for($i = 1; $i -le 10; $i++) {Write-Host "Day #${i} in a bank..."; &.\AtomicLoopInLoupe.exe;}
 
     ... and PS's  command-(multi)line:
 for($i = 1; $i -le 10; $i++)`
