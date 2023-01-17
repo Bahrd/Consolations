@@ -9,24 +9,25 @@ struct gcd<k, 0>
 	enum { value = k };
 };
 
-template <long w, long M, long k = w, long = 0>
+template <auto w, auto M, auto k = w, auto = 0>
 struct mult_inv
 {
-	enum { res = (k - 1) * M % w				};
-	enum { μ = mult_inv<w, M, k - 1, res>::μ	};
+	static constexpr auto res = (k - 1) * M % w;
+	static constexpr auto μ = mult_inv<w, M, k - 1, res>::μ;
 };
 
-template <long w, long M, long k>
+template <auto w, auto M, auto k>
 struct mult_inv<w, M, k, 1>
 {
-	enum { μ = k };
+	static constexpr auto μ = k;
 };
 
-template <long M, long k, long res>
+template <auto M, auto k, auto res>
 struct mult_inv<1, M, k, res>
 {
-	enum { μ = 1 };
+	static constexpr auto μ = 1;
 };
+
 
 int main()
 {	
