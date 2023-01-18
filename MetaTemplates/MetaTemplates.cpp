@@ -66,9 +66,9 @@ consteval auto mm(auto const a, auto const b)
 
 int main()
 {
-	const auto [_, __, v] {ii(97, 18)};
+	const auto [_, __, v] {ii(97, 18)	};
 	constexpr auto	   x  {im<97, 18>::x},
 					   y  {mi<97, 18>::μ},
-					   z  {mm(97, 18)};
+					   z  {mm(97, 18)	};
 	return v - x + y - z;                  	
 }
