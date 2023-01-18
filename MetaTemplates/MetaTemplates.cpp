@@ -9,47 +9,66 @@ struct gcd<k, 0>
 	enum { value = k };
 };
 
+/* Evaluates mult_inv<p, q>::μ = q⁻¹ mod p,
+   that is, μ⋅q mod p = 1 (a brute force/naïve approach) */
 template <auto w, auto M, auto k = w, auto = 0>
-struct mult_inv
+struct mi
 {
 	static constexpr auto res = (k - 1) * M % w;
-	static constexpr auto μ = mult_inv<w, M, k - 1, res>::μ;
+	static constexpr auto μ = mi<w, M, k - 1, res>::μ;
 };
-
 template <auto w, auto M, auto k>
-struct mult_inv<w, M, k, 1>
+struct mi<w, M, k, 1>
 {
 	static constexpr auto μ = k;
 };
-
 template <auto M, auto k, auto res>
-struct mult_inv<1, M, k, res>
+struct mi<1, M, k, res>
 {
 	static constexpr auto μ = 1;
 };
 
-
-
-/** A bit smarter version: https://stackoverflow.com/a/9758173/17524824
+/* A bit smarter version: https://stackoverflow.com/a/9758173/17524824
 def egcd(a, b):
-   if a == 0:
+	if a == 0:
 		return (b, 0, 1)
 	else:
 		g, y, x = egcd(b % a, a)
 		return (g, x - (b // a) * y, y)
 */
+template <auto a, auto b>
+struct im
+{
+	static constexpr auto g = im<b%a, a>::g,
+						  y = im<b%a, a>::x - (b/a) * im<b%a, a>::y,
+						  x = im<b%a, a>::y;
+};
+template <auto b>
+struct im<0, b>
+{
+	static constexpr auto g = b, y = 0, x = 1;
+};
 
 #include <tuple>
-consteval std::tuple<int, int, int> mi(auto a, auto b)
+using std::tuple;
+consteval std::tuple<int, int, int> ii(auto const a, auto const b)
 {
-	using std::tuple;
-	return a ? tuple(get<0>(mi(b%a, a)),
-			         get<2>(mi(b%a, a)) - (b / a) * get<1>(mi(b%a, a)), 
-				     get<1>(mi(b%a, a)))
+	return a ? tuple(get<0>(ii(b%a, a)),
+			         get<2>(ii(b%a, a)) - (b / a) * get<1>(ii(b%a, a)), 
+				     get<1>(ii(b%a, a)))
 		     : tuple(b, 0, 1);
 }
+consteval auto mm(auto const a, auto const b)
+{
+	return get<2>(ii(a, b));
+}
+
 
 int main()
 {
-	return get<0x2>(mi(97, 18)) - mult_inv<97, 18>::μ;
-}						  	   // mult_inv< p,  q>::μ = q⁻¹ mod p, that is, μ⋅q mod p = 1
+	const auto [_, __, v] {ii(97, 18)};
+	constexpr auto	   x  {im<97, 18>::x},
+					   y  {mi<97, 18>::μ},
+					   z  {mm(97, 18)};
+	return v - x + y - z;                  	
+}
