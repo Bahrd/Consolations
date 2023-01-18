@@ -29,8 +29,27 @@ struct mult_inv<1, M, k, res>
 };
 
 
-int main()
-{	
-	return mult_inv<97, 18>::μ;
-	//     mult_inv< p,  q>::μ = q⁻¹ mod p, that is, μ⋅q mod p = 1
+
+/** A bit smarter version: https://stackoverflow.com/a/9758173/17524824
+def egcd(a, b):
+   if a == 0:
+		return (b, 0, 1)
+	else:
+		g, y, x = egcd(b % a, a)
+		return (g, x - (b // a) * y, y)
+*/
+
+#include <tuple>
+consteval std::tuple<int, int, int> mi(auto a, auto b)
+{
+	using std::tuple;
+	return a ? tuple(get<0>(mi(b%a, a)),
+			         get<2>(mi(b%a, a)) - (b / a) * get<1>(mi(b%a, a)), 
+				     get<1>(mi(b%a, a)))
+		     : tuple(b, 0, 1);
 }
+
+int main()
+{
+	return get<0x2>(mi(97, 18)) - mult_inv<97, 18>::μ;
+}						  	   // mult_inv< p,  q>::μ = q⁻¹ mod p, that is, μ⋅q mod p = 1
