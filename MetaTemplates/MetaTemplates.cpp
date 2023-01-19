@@ -1,4 +1,5 @@
-﻿template <int k, int l>
+﻿// Template computing (like in the old days) compile-time version
+template <int k, int l>
 struct gcd
 {
 	enum { value = gcd<l, k% l>::value };
@@ -59,18 +60,16 @@ auto rtmi(auto const a, auto const b)
 	return (x + a) % a;
 }
 
-// Template computing (like in the old days) compile-time version
+// Contemporary compile-time only version
 template <int a, int b>
 struct _im
 {
 private:
-	static constexpr int _g = _im<b% a, a>::g,
-						 _x = _im<b% a, a>::x, 
-		                 _y = _im<b% a, a>::y;
+	using _im_ = _im<b% a, a>;
 public:
-	static constexpr int g = _g;
-	static constexpr int y = _x - (b / a) * _y;
-	static constexpr int x = _y;
+	static constexpr int g = _im_::g,
+						 y = _im_::x - (b / a) * _im_::y,
+						 x = _im_::y;
 };
 template <int b>
 struct _im<0, b>
@@ -84,10 +83,10 @@ struct im
 	static constexpr int x = (a + _im<a, b>::x) % a;
 };
 
-// Contemporary compile-time version
+// Contemporary compile- and run-time version
 consteval std::tuple<int, int, int> imi(int const a, int const b)
 {
-	return a ? tuple(get<0>(imi(b % a, a)),
+	return a ? tuple(get<0>(imi(b%a, a)),
 			         get<2>(imi(b%a, a)) - (b/a) * get<1>(imi(b%a, a)), 
 				     get<1>(imi(b%a, a)))
 		     : tuple(b, 0, 1);
@@ -105,7 +104,7 @@ int main()
 	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mm(p, q);
 	static_assert(x * q % p == 1 && y == x && z == y, "Something's fishy...");
 
-	auto [_, __, v] = imi(p, q);
+	auto [_, __, v] {imi(p, q)};
 	assert(v == rtmi(p, q));
 	
 	return v - x + y - z;
