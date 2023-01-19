@@ -58,7 +58,7 @@ consteval std::tuple<int, int, int> ii(auto const a, auto const b)
 				     get<1>(ii(b%a, a)))
 		     : tuple(b, 0, 1);
 }
-consteval auto mm(auto const a, auto const b)
+consteval int mm(int const a, int const b)
 {
 	return get<2>(ii(a, b));
 }
@@ -66,10 +66,11 @@ consteval auto mm(auto const a, auto const b)
 
 int main()
 {
-	int v; std::tie(std::ignore, std::ignore, v) = ii(97, 18); 
-	//                     const auto [_, __, v] = ii(97, 18);
-	constexpr auto x  {im<97, 18>::x},
-				   y  (mi<97, 18>::μ),
-				   z = mm(97, 18);
+	constexpr auto p = 257, q = 81;
+	int v; std::tie(std::ignore, std::ignore, v) = ii(p, q); 
+	//                     const auto [_, __, v] = ii(p, q);
+	constexpr auto x  {im<p, q>::x},
+				   y  (mi<p, q>::μ),
+				   z = mm(p, q);
 	return v - x + y - z;                  	
 }
