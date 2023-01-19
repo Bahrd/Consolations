@@ -103,7 +103,7 @@ int main()
 	static_assert(gcd<p, q>::value == 1, "gcd(p, q) != 1...");
 	
 	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mm(p, q);
-	static_assert(x * q % p == 1 && x == y && z == x, "Something's fishy...");
+	static_assert(x * q % p == 1 && y == x && z == y, "Something's fishy...");
 
 	auto [_, __, v] = imi(p, q);
 	assert(v == rtmi(p, q));
