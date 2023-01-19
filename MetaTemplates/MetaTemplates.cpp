@@ -55,11 +55,11 @@ std::tuple<int, int, int> rtii(auto const a, auto const b)
 }
 auto rtmi(auto const a, auto const b)
 {
-	auto [_, __, x] = rtii(a, b);
+	int x; std::tie(std::ignore, std::ignore, x) = rtii(a, b);
 	return (x + a) % a;
 }
 
-// Template computing (like in the old days)  compile-time version
+// Template computing (like in the old days) compile-time version
 template <int a, int b>
 struct _im
 {
@@ -97,16 +97,16 @@ consteval int mm(int const a, int const b)
 	return (a + get<2>(imi(a, b))) % a;
 }
 
-
 int main()
 {
-	constexpr auto p = 197, q = 85;
-	static_assert(gcd<p, q>::value == 1, "p and q aren't relatively prime...");
+	constexpr auto p{197}, q(85);
+	static_assert(gcd<p, q>::value == 1, "gcd(p, q) != 1...");
 	
-	constexpr auto x = im<p, q>::x, y(mi<p, q>::μ), z{mm(p, q)};
+	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mm(p, q);
 	static_assert(x * q % p == 1 && x == y && z == x, "Something's fishy...");
 
-	auto v = rtmi(p, q);								assert(v == x);
-	std::tie(std::ignore, std::ignore, v) = imi(p, q);	assert(v == x);
+	auto [_, __, v] = imi(p, q);
+	assert(v == rtmi(p, q));
+	
 	return v - x + y - z;
 }
