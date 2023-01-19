@@ -36,41 +36,77 @@ def egcd(a, b):
 		g, y, x = egcd(b % a, a)
 		return (g, x - (b // a) * y, y)
 */
-template <auto a, auto b>
+
+// Ordinary (run-time) carbon-copy implementation
+#include <tuple>
+#include <cassert>
+using std::tuple;
+std::tuple<int, int, int> rtii(auto const a, auto const b)
+{
+	if (a)
+	{
+		auto [g, y, x] = rtii(b % a, a);
+		return tuple(g, x - (b / a) * y, y);
+	}
+	else
+	{
+		return tuple(b, 0, 1);
+	}
+}
+auto rtmi(auto const a, auto const b)
+{
+	auto [_, __, x] = rtii(a, b);
+	return (x + a) % a;
+}
+
+// Template computing (like in the old days)  compile-time version
+template <int a, int b>
+struct _im
+{
+private:
+	static constexpr int _g = _im<b% a, a>::g,
+						 _x = _im<b% a, a>::x, 
+		                 _y = _im<b% a, a>::y;
+public:
+	static constexpr int g = _g;
+	static constexpr int y = _x - (b / a) * _y;
+	static constexpr int x = _y;
+};
+template <int b>
+struct _im<0, b>
+{
+	static constexpr int g = b, y = 0, x = 1;
+};
+template <int a, int b>
 struct im
 {
-	static constexpr auto g = im<b%a, a>::g,
-						  y = im<b%a, a>::x - (b/a) * im<b%a, a>::y,
-						  x = im<b%a, a>::y;
-};
-template <auto b>
-struct im<0, b>
-{
-	static constexpr auto g = b, y = 0, x = 1;
+	static_assert(_im<a, b>::g == 1);
+	static constexpr int x = (a + _im<a, b>::x) % a;
 };
 
-#include <tuple>
-using std::tuple;
-consteval std::tuple<int, int, int> ii(auto const a, auto const b)
+// Contemporary compile-time version
+consteval std::tuple<int, int, int> imi(int const a, int const b)
 {
-	return a ? tuple(get<0>(ii(b%a, a)),
-			         get<2>(ii(b%a, a)) - (b/a) * get<1>(ii(b%a, a)), 
-				     get<1>(ii(b%a, a)))
+	return a ? tuple(get<0>(imi(b % a, a)),
+			         get<2>(imi(b%a, a)) - (b/a) * get<1>(imi(b%a, a)), 
+				     get<1>(imi(b%a, a)))
 		     : tuple(b, 0, 1);
 }
 consteval int mm(int const a, int const b)
 {
-	return get<2>(ii(a, b));
+	return (a + get<2>(imi(a, b))) % a;
 }
+
 
 int main()
 {
-	constexpr auto p = 97, q = 86;
+	constexpr auto p = 197, q = 85;
+	static_assert(gcd<p, q>::value == 1, "p and q aren't relatively prime...");
+	
+	constexpr auto x = im<p, q>::x, y(mi<p, q>::μ), z{mm(p, q)};
+	static_assert(x * q % p == 1 && x == y && z == x, "Something's fishy...");
 
-	int v; std::tie(std::ignore, std::ignore, v) = ii(p, q); 
-	//                     const auto [_, __, v] = ii(p, q);
-	constexpr auto x  {im<p, q>::x},
-				   y  (mi<p, q>::μ),
-				   z = mm(p, q);
-	return v - x + y - z;                  	
+	auto v = rtmi(p, q);								assert(v == x);
+	std::tie(std::ignore, std::ignore, v) = imi(p, q);	assert(v == x);
+	return v - x + y - z;
 }
