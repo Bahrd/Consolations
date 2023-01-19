@@ -63,10 +63,10 @@ consteval int mm(int const a, int const b)
 	return get<2>(ii(a, b));
 }
 
-
 int main()
 {
-	constexpr auto p = 257, q = 81;
+	constexpr auto p = 97, q = 86;
+
 	int v; std::tie(std::ignore, std::ignore, v) = ii(p, q); 
 	//                     const auto [_, __, v] = ii(p, q);
 	constexpr auto x  {im<p, q>::x},
