@@ -2,12 +2,12 @@
 template <int k, int l>
 struct gcd
 {
-	enum { value = gcd<l, k% l>::value };
+	enum divisor { value = gcd<l, k% l>::value };
 };
 template <int k>
 struct gcd<k, 0>
 {
-	enum { value = k };
+	enum divisor { value = k };
 };
 
 /* Evaluates mult_inv<p, q>::μ = q⁻¹ mod p,
@@ -61,37 +61,37 @@ auto rtmi(auto const a, auto const b)
 }
 
 // Contemporary compile-time only version
-template <int a, int b>
+template <auto a, auto b>
 struct _im
 {
 private:
 	using _im_ = _im<b% a, a>;
 public:
-	static constexpr int g = _im_::g,
+	static constexpr auto g = _im_::g,
 						 y = _im_::x - (b / a) * _im_::y,
 						 x = _im_::y;
 };
-template <int b>
+template <auto b>
 struct _im<0, b>
 {
-	static constexpr int g = b, y = 0, x = 1;
+	static constexpr auto g = b, y = 0, x = 1;
 };
-template <int a, int b>
+template <auto a, auto b>
 struct im
 {
 	static_assert(_im<a, b>::g == 1);
-	static constexpr int x = (a + _im<a, b>::x) % a;
+	static constexpr auto x = (a + _im<a, b>::x) % a;
 };
 
 // Contemporary compile- and run-time version
-consteval std::tuple<int, int, int> imi(int const a, int const b)
+consteval std::tuple<int, int, int> imi(auto const a, auto const b)
 {
 	return a ? tuple(get<0>(imi(b%a, a)),
 			         get<2>(imi(b%a, a)) - (b/a) * get<1>(imi(b%a, a)), 
 				     get<1>(imi(b%a, a)))
 		     : tuple(b, 0, 1);
 }
-consteval int mm(int const a, int const b)
+consteval int mm(auto const a, auto const b)
 {
 	return (a + get<2>(imi(a, b))) % a;
 }
