@@ -62,29 +62,29 @@ auto rtmi(auto const a, auto const b)
 
 // Contemporary compile-time only version
 template <auto a, auto b>
-struct _im
-{
-private:
-	using _im_ = _im<b% a, a>;
-public:
-	static constexpr auto g = _im_::g,
-						 y = _im_::x - (b / a) * _im_::y,
-						 x = _im_::y;
-};
-template <auto b>
-struct _im<0, b>
-{
-	static constexpr auto g = b, y = 0, x = 1;
-};
-template <auto a, auto b>
 struct im
 {
-	static_assert(_im<a, b>::g == 1);
-	static constexpr auto x = (a + _im<a, b>::x) % a;
+private:
+	template <auto a, auto b>
+	struct _im
+	{
+		using _im_ = _im<b% a, a>;
+		static constexpr auto g = _im_::g,
+							  y = _im_::x - (b / a) * _im_::y,
+							  x = _im_::y;
+	};
+	template <auto b>
+	struct _im<0, b>
+	{
+		static constexpr auto g = b, y = 0, x = 1;
+	};
+public:
+	static_assert(im::_im<a, b>::g == 1);
+	static constexpr auto x = (a + im::_im<a, b>::x) % a;
 };
 
 // Contemporary compile- and run-time version
-consteval std::tuple<int, int, int> imi(auto const a, auto const b)
+consteval std::tuple<int, int, int> imi(auto a, auto b)
 {
 	return a ? tuple(get<0>(imi(b%a, a)),
 			         get<2>(imi(b%a, a)) - (b/a) * get<1>(imi(b%a, a)), 
