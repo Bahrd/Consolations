@@ -42,7 +42,9 @@ def egcd(a, b):
 #include <tuple>
 #include <cassert>
 using std::tuple;
-std::tuple<int, int, int> rtii(auto const a, auto const b)
+using tpl_iii = std::tuple<int, int, int>;
+
+tpl_iii rtii(auto a, auto b)
 {
 	if (a)
 	{
@@ -54,7 +56,7 @@ std::tuple<int, int, int> rtii(auto const a, auto const b)
 		return tuple(b, 0, 1);
 	}
 }
-auto rtmi(auto const a, auto const b)
+auto rtmi(auto a, auto b)
 {
 	int x; std::tie(std::ignore, std::ignore, x) = rtii(a, b);
 	return (x + a) % a;
@@ -84,14 +86,15 @@ public:
 };
 
 // Contemporary compile- and run-time version
-consteval std::tuple<int, int, int> imi(auto a, auto b)
+consteval tpl_iii imi(auto a, auto b)
 {
-	return a ? tuple(get<0>(imi(b%a, a)),
-			         get<2>(imi(b%a, a)) - (b/a) * get<1>(imi(b%a, a)), 
-				     get<1>(imi(b%a, a)))
-		     : tuple(b, 0, 1);
+	auto _i_ = a ? imi(b % a, a) : tuple(b, 0, 1);
+	return a ? tuple(get<0>(_i_),
+			 		 get<2>(_i_) - (b / a) * get<1>(_i_),
+					 get<1>(_i_))
+			 : _i_;
 }
-consteval int mm(auto const a, auto const b)
+consteval int mm(auto a, auto b)
 {
 	return (a + get<2>(imi(a, b))) % a;
 }
