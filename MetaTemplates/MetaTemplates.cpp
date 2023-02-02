@@ -36,9 +36,8 @@ def egcd(a, b):
 	else:
 		g, y, x = egcd(b % a, a)
 		return (g, x - (b // a) * y, y)
-*/
 
-// Ordinary (run-time) carbon-copy implementation
+ ... and its (gcc) generic carbon-copy (run-time only) implementation */
 #include <tuple>
 #include <cassert>
 using std::tuple;
