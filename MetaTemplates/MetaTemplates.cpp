@@ -67,22 +67,22 @@ template <auto a, auto b>
 struct im
 {
 private:
-	template <auto a, auto b>
+	template <auto _a, auto _b>
 	struct _im
 	{
-		using _im_ = _im<b% a, a>;
+		using _im_ = _im<_b% _a, _a>;
 		static constexpr auto g = _im_::g,
-							  y = _im_::x - (b / a) * _im_::y,
+							  y = _im_::x - (_b / _a) * _im_::y,
 							  x = _im_::y;
 	};
-	template <auto b>
-	struct _im<0, b>
+	template <auto _b>
+	struct _im<0, _b>
 	{
-		static constexpr auto g = b, y = 0, x = 1;
+		static constexpr auto g = _b, y = 0, x = 1;
 	};
 public:
-	static_assert(im::_im<a, b>::g == 1);
-	static constexpr auto x = (a + im::_im<a, b>::x) % a;
+	static_assert(_im<a, b>::g == 1);
+	static constexpr auto x = (a + _im<a, b>::x) % a;
 };
 
 // Contemporary compile- and run-time version
@@ -94,7 +94,7 @@ consteval tpl_iii imi(auto a, auto b)
 					 get<1>(_i_))
 			 : _i_;
 }
-consteval int mm(auto a, auto b)
+consteval auto mim(auto a, auto b)
 {
 	return (a + get<2>(imi(a, b))) % a;
 }
@@ -104,7 +104,7 @@ int main()
 	constexpr auto p{197}, q(85);
 	static_assert(gcd<p, q>::value == 1, "gcd(p, q) != 1...");
 	
-	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mm(p, q);
+	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mim(p, q);
 	static_assert(x * q % p == 1 && y == x && z == y, "Something's fishy...");
 
 	auto [_, __, v] {imi(p, q)};
