@@ -41,9 +41,13 @@ def egcd(a, b):
 #include <tuple>
 #include <cassert>
 using std::tuple;
-using tpl_iii = std::tuple<int, int, int>;
 
-tpl_iii rtii(auto a, auto b)
+template <typename...T>
+using stpl = std::tuple<T...>;
+
+using stpl3i = stpl<int, int, int>;
+
+stpl3i rtii(auto a, auto b)
 {
 	if (a)
 	{
@@ -85,7 +89,7 @@ public:
 };
 
 // Contemporary compile- and run-time version
-consteval tpl_iii imi(auto a, auto b)
+consteval stpl3i imi(auto a, auto b)
 {
 	auto _i_ = a ? imi(b % a, a) : tuple(b, 0, 1);
 	return a ? tuple(get<0>(_i_),
@@ -100,7 +104,7 @@ consteval auto mim(auto a, auto b)
 
 int main()
 {
-	constexpr auto p{197}, q(85);
+	const auto p{197}, q(85);
 	static_assert(gcd<p, q>::value == 1, "gcd(p, q) != 1...");
 	
 	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mim(p, q);
