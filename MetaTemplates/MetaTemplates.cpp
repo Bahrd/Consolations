@@ -91,11 +91,13 @@ public:
 // Contemporary compile- and run-time version
 consteval stpl3i imi(auto a, auto b)
 {
-	auto _i_ = a ? imi(b % a, a) : tuple(b, 0, 1);
-	return a ? tuple(get<0>(_i_),
-			 		 get<2>(_i_) - (b / a) * get<1>(_i_),
-					 get<1>(_i_))
-			 : _i_;
+	if (auto _i_ = imi(b % a, a); a)
+	{
+		return tuple(get<0>(_i_),
+					 get<2>(_i_) - (b / a) * get<1>(_i_),
+					 get<1>(_i_));
+	}
+	return tuple(b, 0, 1);
 }
 consteval auto mim(auto a, auto b)
 {
