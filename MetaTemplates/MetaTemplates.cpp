@@ -37,7 +37,7 @@ def egcd(a, b):
 		g, y, x = egcd(b % a, a)
 		return (g, x - (b // a) * y, y)
 
-... and a bunch of its more/less (gcc's) generic carbon copies */
+... and a bunch of its more/less generic carbon copies (a.k.a. gcc's) */
 #include <tuple>
 #include <cassert>
 
@@ -64,7 +64,7 @@ auto rtmi(auto a, auto b)
 	return (x + a) % a;
 }
 
-// Modern compile-time only version
+// A modern compile-time only version
 template <auto a, auto b>
 struct im
 {
