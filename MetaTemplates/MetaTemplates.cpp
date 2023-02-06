@@ -37,16 +37,15 @@ def egcd(a, b):
 		g, y, x = egcd(b % a, a)
 		return (g, x - (b // a) * y, y)
 
- ... and its (gcc) generic carbon-copy (run-time only) implementation */
+... and a bunch of its more/less (gcc's) generic carbon copies */
 #include <tuple>
 #include <cassert>
+
 using std::tuple;
-
-template <typename...T>
-using stpl = std::tuple<T...>;
-
+template <typename...T> using stpl = std::tuple<T...>;
 using stpl3i = stpl<int, int, int>;
 
+// A run-time only instantiation
 stpl3i rtii(auto a, auto b)
 {
 	if (a)
@@ -65,7 +64,7 @@ auto rtmi(auto a, auto b)
 	return (x + a) % a;
 }
 
-// Contemporary compile-time only version
+// Modern compile-time only version
 template <auto a, auto b>
 struct im
 {
@@ -88,11 +87,12 @@ public:
 	static constexpr auto x = (a + _im<a, b>::x) % a;
 };
 
-// Contemporary compile- and run-time version
+// Contemporary, compile- and run-time implementation
 consteval stpl3i imi(auto a, auto b)
 {
-	if (auto _i_ = imi(b % a, a); a)
+	if (a)
 	{
+		auto _i_ = imi(b % a, a);
 		return tuple(get<0>(_i_),
 					 get<2>(_i_) - (b / a) * get<1>(_i_),
 					 get<1>(_i_));
