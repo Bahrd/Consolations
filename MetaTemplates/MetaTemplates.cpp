@@ -15,8 +15,8 @@ struct gcd<k, 0>
 template <auto w, auto M, auto k = w, auto = 0>
 struct mi
 {
-	static constexpr auto res = (k - 1) * M % w;
-	static constexpr auto μ = mi<w, M, k - 1, res>::μ;
+	static constexpr auto res = (k - 1) * M % w,
+		                    μ = mi<w, M, k - 1, res>::μ;
 };
 template <auto w, auto M, auto k>
 struct mi<w, M, k, 1>
@@ -53,15 +53,12 @@ stpl3i rtii(auto a, auto b)
 		auto [g, y, x] = rtii(b % a, a);
 		return tuple(g, x - (b / a) * y, y);
 	}
-	else
-	{
-		return tuple(b, 0, 1);
-	}
+	return tuple(b, 0, 1);
 }
 auto rtmi(auto a, auto b)
 {
 	int x; std::tie(std::ignore, std::ignore, x) = rtii(a, b);
-	return (x + a) % a;
+	return (a + x) % a;
 }
 
 // A modern compile-time only version
@@ -83,8 +80,8 @@ private:
 		static constexpr auto g = _b, y = 0, x = 1;
 	};
 public:
-	static_assert(_im<a, b>::g == 1);
 	static constexpr auto x = (a + _im<a, b>::x) % a;
+	static_assert(_im<a, b>::g == 1);
 };
 
 // Contemporary, compile- and run-time implementation
