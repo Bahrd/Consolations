@@ -67,21 +67,21 @@ struct im
 {
 private:
 	template <auto _a, auto _b>
-	struct _im
+	struct _
 	{
-		using _im_ = _im<_b% _a, _a>;
-		static constexpr auto g = _im_::g,
-							  y = _im_::x - (_b / _a) * _im_::y,
-							  x = _im_::y;
+		using __ = _<_b% _a, _a>;
+		static constexpr auto g = __::g,
+							  y = __::x - (_b / _a) * __::y,
+							  x = __::y;
 	};
 	template <auto _b>
-	struct _im<0, _b>
+	struct _<0, _b>
 	{
 		static constexpr auto g = _b, y = 0, x = 1;
 	};
 public:
-	static constexpr auto x = (a + _im<a, b>::x) % a;
-	static_assert(_im<a, b>::g == 1);
+	static constexpr auto x = (a + _<a, b>::x) % a;
+	static_assert(_<a, b>::g == 1);
 };
 
 // Contemporary, compile- and run-time implementation
@@ -89,10 +89,10 @@ consteval stpl3i imi(auto a, auto b)
 {
 	if (a)
 	{
-		auto _i_ = imi(b % a, a);
-		return tuple(get<0>(_i_),
-					 get<2>(_i_) - (b / a) * get<1>(_i_),
-					 get<1>(_i_));
+		auto _ = imi(b % a, a);
+		return tuple(get<0>(_),
+					 get<2>(_) - (b / a) * get<1>(_),
+					 get<1>(_));
 	}
 	return tuple(b, 0, 1);
 }
