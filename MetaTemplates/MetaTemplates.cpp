@@ -106,9 +106,10 @@ int main()
 	const auto p{197}, q(85);
 	static_assert(gcd<p, q>::value == 1, "gcd(p, q) != 1...");
 	
-	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mim(p, q);
-	static_assert(x * q % p == 1 && y == x && z == y, "Something's fishy...");
-
+	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mim(p, q); 
+	static_assert(not(x * q % p != 1 or y != x or z != y), "Something's fishy, and..."); 
+	static_assert(x * q % p == 1 and y == x and z == y, "... or something really is!"); 
+	
 	auto [_, __, v] {imi(p, q)};
 	assert(v == rtmi(p, q));
 	
