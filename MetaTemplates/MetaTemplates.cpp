@@ -107,10 +107,9 @@ int main()
 	static_assert(gcd<p, q>::value == 1, "gcd(p, q) != 1...");
 	
 	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mim(p, q); 
-	static_assert(not(x * q % p != 1  or y != x  or z != y) // A bit of Boolean algebra...
-		              &&									// Namely, 
-	                  x * q % p == 1 and y == x and z == y, // De Morgan's laws.
-		          "Something's fishy..."); 
+	constexpr auto a = not(x * q % p != 1  or y != x  or z != y), // A bit of Boolean algebra...
+		           b =     x * q % p == 1 and y == x and z == y;  // namely, the De Morgan's laws. 
+	static_assert(a && b, "Something's fishy..."); 
 	
 	auto [_, __, v] {imi(p, q)};
 	assert(v == rtmi(p, q));
