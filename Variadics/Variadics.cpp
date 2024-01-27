@@ -1,5 +1,4 @@
-import std.core;
-import std.threading;
+import std;
 
 // https://en.cppreference.com/w/cpp/utility/integer_sequence
 // Pretty-Print a Tuple 
@@ -52,10 +51,9 @@ void g(Args... args)
 
 int main()
 {
-    using stp = std::tuple;
-    std::cout << std::noboolalpha << stp{ 1, '1', "1", stp{ 1.0, true  }} << std::endl
-              << std::boolalpha   << stp{ 0, "0", '0', stp{ 0.0, false }} << std::endl
-              << std::bitset<0b111>     {add(0b1, 0b10, 0111, 0x10, 0x1)} << std::endl  // Trick...
-              << std::format("{:b}",     add(0b1, 0b10, 0111, 0x10, 0x1)) << std::endl; // or threat...
+    std::cout << std::noboolalpha << std::tuple{ 1, '1', "1", std::tuple{ 1.0, true  }} << std::endl
+              << std::boolalpha   << std::tuple{ 0, "0", '0', std::tuple{ 0.0, false }} << std::endl
+              << std::bitset<0b111> {add(0b1, 0b10, 0111, 0x10, 0x1)} << std::endl  // Trick...
+              << std::format("{:b}", add(0b1, 0b10, 0111, 0x10, 0x1)) << std::endl; // or threat...
     return 0;
 }

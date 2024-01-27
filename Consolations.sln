@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32126.315
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Consolations", "Consolations\Consolations.vcxproj", "{498DA0C8-590C-4D74-AB66-E709E1EA1A38}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Variadics", "Variadics\Variadics.vcxproj", "{D365A59C-77C4-405D-B9C6-C9AADCB57681}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConCoroutine", "ConCoroutine\ConCoroutine.csproj", "{17CAE829-3A5B-4248-8DF7-C3FDB0339678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArithmetiC", "ArithmetiC\ArithmetiC.csproj", "{84BCA26C-F396-47E0-9D93-61FF7DF03B60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,6 +108,18 @@ Global
 		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|x64.Build.0 = Release|Any CPU
 		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|x86.ActiveCfg = Release|Any CPU
 		{17CAE829-3A5B-4248-8DF7-C3FDB0339678}.Release|x86.Build.0 = Release|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Debug|x64.Build.0 = Debug|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Debug|x86.Build.0 = Debug|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Release|x64.ActiveCfg = Release|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Release|x64.Build.0 = Release|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Release|x86.ActiveCfg = Release|Any CPU
+		{84BCA26C-F396-47E0-9D93-61FF7DF03B60}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

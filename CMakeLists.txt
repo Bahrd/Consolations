@@ -6,6 +6,7 @@ cmake_minimum_required (VERSION 3.8)
 project ("Consolations")
 
 # Include sub-projects.
+add_subdirectory ("fft")
 add_subdirectory ("VariadicAsyncT")
 add_subdirectory ("MetaTemplates")
 add_subdirectory ("SummAnonymous")
