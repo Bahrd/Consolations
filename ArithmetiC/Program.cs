@@ -157,25 +157,24 @@
                 C += Fx[index] * A;
                 A *= fx[index];
                 
+                // Exception handling
+                if(A / 2m == 0m)
+                {
+                    var msg = $"\nMessage '{text}' has too much information for a given arithmetic precision.";
+                        msg += $"Coding interval ({C}, {C + A}) not wide enough...";
+                    throw new Exception(msg);
+                }
+
+                // Visual representation of the coding interval
                 var width = 96;
-                var (c, a) = (Convert.ToInt32(C * width), Convert.ToInt32(A * width));                
-                Console.Out.WriteLine(new string(' ', c) + new string('.', 1 + a) 
+                var (c, a) = (Convert.ToInt32(C * width), Convert.ToInt32(A * width));
+                Console.Out.WriteLine(new string(' ', c) + new string('.', 1 + a)
                                                          + new string(' ', 1 + width - c - a)
                                                          + $"[{C}, {C + A})");
             }
-            if (A == 0m)
-            {
-                throw new Exception($"Message '{text}' too long for a given arithmetic precision.");
-            }
-            code = C + A / 2m;
-            /// "Binarization"
-            {
-                var mb = Convert.ToInt32(Math.Ceiling(-Math.Log(Convert.ToDouble(A), 2))) + 1;
-
-                Decimal binaryRange = Convert.ToDecimal(1 << mb);
-                Decimal coded_message = Math.Floor(code * binaryRange) / binaryRange;
-                code = coded_message;
-            }
+            // The final code is just any number from the middle of the interval
+            // (provided that the interval still has a middle! ;)
+            code = C + (A/2m);
         }
 
         public void Decode()
@@ -198,7 +197,7 @@
         {
             Console.Out.WriteLine($"\n\nIn the 8-bit ASCII code this message has {text.Length * 8} bits");
             int bits_size = Convert.ToInt32(Math.Ceiling(Math.Log(size, 2)));
-            Console.Out.WriteLine($"\n\nIn the {bits_size}-bit code this message has {text.Length * bits_size} bits");
+            Console.Out.WriteLine($"\n\nIn the fixed-size {bits_size}-bit code this message has {text.Length * bits_size} bits");
             Console.Out.WriteLine($"The arithmetic code of \n\n{text}\n\nis any number from interval\n[{C}, {C + A})");
             Console.Out.WriteLine($"\n\nFor instance\n{code}\n");
             int messageLength = Convert.ToInt32(Math.Ceiling(-Math.Log(Convert.ToDouble(A), 2)));
