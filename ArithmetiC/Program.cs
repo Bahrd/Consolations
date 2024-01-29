@@ -2,12 +2,13 @@
 {
     class AritmeticCoder : IDisposable
     {
-        private readonly List<decimal> fx, Fx;
         string text;
         decimal code;
         decimal C, A;
 
-        #region frequencies
+        readonly decimal []fx;
+        readonly List<decimal> Fx = new List<decimal> { 0m };
+
         /**
          * "PMS"
          * Taken from nowhere...
@@ -47,11 +48,11 @@
                                                     0.0625,
                                                     0.875976563*/
                                                         };
+        #region frequencies
         /**
          * "Etaoin Shrdlu"
          * Taken from http://rinkworks.com/words/letterfreq.shtml
          */
-
         /*      const int size = 26;
 
               int[] letterFreqMap = new int[size];
@@ -120,24 +121,22 @@
         {
             (text, code, C, A) = (args, 0.0m, 0.0m, 1.0m);
 
+            //  All kinds of loops I know...
+            //  Old school
             for (var index = 0; index < size; ++index)
-            {
                 letterFreqMap[letterFreqUnmap[index]] = index;
-            }
 
-            (fx, Fx) = (new List<decimal>(size), new List<decimal>(size));
-            foreach (double _freq in letterFreq)
-            {
-                // conversion (trimming) to finite binary representation
-                var bits = 13;
-                (decimal freq, decimal precision) = (Convert.ToDecimal(_freq), (1 << bits));
-
-                fx.Add(Math.Floor(freq * precision) / precision);
-            }
-            // Cumulative frequencies
-            Fx.Add(0.0m);
-            var freqs = fx.ToArray()[0..^1];
-            foreach (var fq in freqs) Fx.Add(Fx[^1] + fq);
+            var bits = 12;
+            //  LINQ style
+            fx = (from _freq in letterFreq
+                  let freq = Convert.ToDecimal(_freq)
+                  let precision = (1 << bits)
+                  select Math.Floor(freq * precision) / precision).ToArray();
+            
+            //  Functional(?) style
+            foreach (var fq in fx[0..^1]) 
+                Fx.Add(Fx[^1] + fq); // Cumulated frequencies: eg. [0, 1 - p, 1 - p + 3p/4].
+                                     // The last one is 1.0 and not included in the array.
 
             Console.OutputEncoding = System.Text.Encoding.UTF8;
         }
@@ -172,7 +171,7 @@
                 }
 
                 // Visual representation of the coding interval
-                var (c, a) = (Convert.ToInt32(C * width), Convert.ToInt32(A * width));
+                var (c, a) = (Convert.ToInt32(C * width), 1 + Convert.ToInt32(A * width));
                 Console.WriteLine("[" + new string(' ', c) + new string('.', a)
                                                          + new string(' ', width - c - a)
                                                          + $") [{C}, {C + A})");
