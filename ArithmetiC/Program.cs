@@ -5,9 +5,7 @@
         string text;
         decimal code;
         decimal C, A;
-
-        readonly decimal []fx;
-        readonly List<decimal> Fx = new List<decimal> { 0m };
+        readonly List<decimal> fx = new(), Fx = new() { 0m };
 
         /**
          * "PMS"
@@ -121,23 +119,21 @@
         {
             (text, code, C, A) = (args, 0.0m, 0.0m, 1.0m);
 
-            //  All kinds of loops I know...
-            //  Old school
+            //  All kinds of for-loops I know...
+            //  An old school...
             for (var index = 0; index < size; ++index)
                 letterFreqMap[letterFreqUnmap[index]] = index;
 
-            var bits = 12;
-            //  LINQ style
-            fx = (from _freq in letterFreq
-                  let freq = Convert.ToDecimal(_freq)
-                  let precision = (1 << bits)
-                  select Math.Floor(freq * precision) / precision).ToArray();
-            
-            //  Functional(?) style
-            foreach (var fq in fx[0..^1]) 
+            //  ... vs. LINQ style
+            foreach (var fq in from _freq in letterFreq
+                               let freq = Convert.ToDecimal(_freq)
+                               let precision = (1 << 12) // A dozen of precision bits
+                               select Math.Floor(freq * precision) / precision)
+            {
+                fx.Add(fq);          // Frequencies: eg. [p, p + 3p/4, p + 1p/4].
                 Fx.Add(Fx[^1] + fq); // Cumulated frequencies: eg. [0, 1 - p, 1 - p + 3p/4].
                                      // The last one is 1.0 and not included in the array.
-
+            }
             Console.OutputEncoding = System.Text.Encoding.UTF8;
         }
         ~AritmeticCoder()
@@ -153,7 +149,7 @@
         {
             var width = 96;
             // A bit of an ASCII art
-            Console.WriteLine("0" + new string('.', width) + "1");
+            Console.WriteLine("0" + new string('.', width + 1) + "1");
             
             foreach (char letter in text)
             {
@@ -165,7 +161,7 @@
                 // Exception handling
                 if(A / 2m == 0m)
                 {
-                    var msg = $"\nMessage '{text}' has too much information for a given arithmetic precision.";
+                    var msg =  $"\nMessage '{text}' has too much information for a given arithmetic precision.";
                         msg += $"Coding interval ({C}, {C + A}) not wide enough...";
                     throw new Exception(msg);
                 }
@@ -173,8 +169,8 @@
                 // Visual representation of the coding interval
                 var (c, a) = (Convert.ToInt32(C * width), 1 + Convert.ToInt32(A * width));
                 Console.WriteLine("[" + new string(' ', c) + new string('.', a)
-                                                         + new string(' ', width - c - a)
-                                                         + $") [{C}, {C + A})");
+                                      + new string(' ', width + 1 - c - a)
+                                      + $") [{C}, {C + A})");
             }
             // The final code is just any number from the middle of the interval
             // (provided that the interval still has a middle! ;)
