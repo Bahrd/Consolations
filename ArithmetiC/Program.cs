@@ -138,6 +138,8 @@
             Fx.Add(0.0m);
             var freqs = fx.ToArray()[0..^1];
             foreach (var fq in freqs) Fx.Add(Fx[^1] + fq);
+
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
         }
         ~AritmeticCoder()
         {
@@ -145,11 +147,15 @@
         }
         public void Dispose()
         {
-            Console.Out.WriteLine("Che sarà sarà...");
+            Console.WriteLine("♪♫ Che sarà, sarà! ♫♪ ");
             GC.SuppressFinalize(this);
         }
         public void Encode()
         {
+            var width = 96;
+            // A bit of an ASCII art
+            Console.WriteLine("0" + new string('.', width) + "1");
+            
             foreach (char letter in text)
             {
                 var index = letterFreqMap[letter - 'a'];
@@ -166,11 +172,10 @@
                 }
 
                 // Visual representation of the coding interval
-                var width = 96;
                 var (c, a) = (Convert.ToInt32(C * width), Convert.ToInt32(A * width));
-                Console.Out.WriteLine(new string(' ', c) + new string('.', 1 + a)
-                                                         + new string(' ', 1 + width - c - a)
-                                                         + $"[{C}, {C + A})");
+                Console.WriteLine("[" + new string(' ', c) + new string('.', a)
+                                                         + new string(' ', width - c - a)
+                                                         + $") [{C}, {C + A})");
             }
             // The final code is just any number from the middle of the interval
             // (provided that the interval still has a middle! ;)
@@ -195,17 +200,17 @@
 
         public void EncodingReport()
         {
-            Console.Out.WriteLine($"\n\nIn the 8-bit ASCII code this message has {text.Length * 8} bits");
+            Console.WriteLine($"\n\nIn the 8-bit ASCII code this message has {text.Length * 8} bits");
             int bits_size = Convert.ToInt32(Math.Ceiling(Math.Log(size, 2)));
-            Console.Out.WriteLine($"\n\nIn the fixed-size {bits_size}-bit code this message has {text.Length * bits_size} bits");
-            Console.Out.WriteLine($"The arithmetic code of \n\n{text}\n\nis any number from interval\n[{C}, {C + A})");
-            Console.Out.WriteLine($"\n\nFor instance\n{code}\n");
+            Console.WriteLine($"\n\nIn the fixed-size {bits_size}-bit code this message has {text.Length * bits_size} bits");
+            Console.WriteLine($"The arithmetic code of \n\n{text}\n\nis any number from interval\n[{C}, {C + A})");
+            Console.WriteLine($"\n\nFor instance\n{code}\n");
             int messageLength = Convert.ToInt32(Math.Ceiling(-Math.Log(Convert.ToDouble(A), 2)));
-            Console.Out.WriteLine($"Which binary representation needs 'only' (wait for it...) {messageLength} bits\n");
+            Console.WriteLine($"Which binary representation needs 'only' (wait for it...) {messageLength} bits\n");
         }
         public void DecodingReport()
         {
-            Console.Out.WriteLine($"\n\nThe decoded message is:\n{text}\n");
+            Console.WriteLine($"\n\nThe decoded message is:\n{text}\n");
         }
         private int Extract(decimal codeValue)
         {
