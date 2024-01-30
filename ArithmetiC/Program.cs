@@ -1,4 +1,14 @@
-﻿namespace ArithmeticCoding
+﻿/** ArithmetiC
+ * * 
+ * * A (much too) simple arithmetic coding algorithm illustration
+ * 
+ *   Be careful! The original code† has heavily been modified with the help of Copilot (AD 2024).
+ *   In particular, the suggested comments were sometimes taken literally. 
+ *   ------------------------------------------------------------
+ *   † Created sometime in that short and eventless period between the Chicxulub impact and 2010 AC.
+ */
+
+namespace ArithmeticCoding
 {
     class AritmeticCoder : IDisposable
     {
@@ -7,54 +17,33 @@
         decimal C, A;
         readonly List<decimal> fx = new(), Fx = new() { 0m };
 
-        /**
-         * "PMS"
-         * Taken from nowhere...
+        /*   Here we use a three letter alphabet: a, b, c‡.
+         *   If the probabilities satisfy the inequality P(a) > P(b) + P(c) 
+         *   (so that the entropy of the source is close(r) to zero),
+         *   the advantage of arithmetic coding over any block coding algorithm 
+         *   can be seen in its full glory.
          */
-        const int size = 3;
-        const double p = 1 / 4.0;
-        const double pa = 1.0 - p, pb = 3*p/4, pc = p/4;
-
-        readonly int[] letterFreqMap = new int[size];
-        readonly int[] letterFreqUnmap = new int[size] { 0, 1, 2 
-                                                        /*,
-                                                        2	,
-                                                        3  ,
-                                                        4  ,
-                                                        5  ,
-                                                        6  ,
-                                                        7*/
-                                                       };
-
-        readonly double[] letterFreq = new double[size] { pa, pb, pc
-                                                        /*,
-                                                           1.0/64.0
-                                                        0.000488281,
-                                                        0.000976563,
-                                                        0.001953125,
-                                                        0.00390625,
-                                                        0.0078125,
-                                                        0.015625,
-                                                        0.03125,
-                                                        0.937988281*/
-                                                        /*0.000976563,
-                                                    0.001953125,
-                                                    0.00390625,
-                                                    0.0078125,
-                                                    0.015625,
-                                                    0.03125,
-                                                    0.0625,
-                                                    0.875976563*/
-                                                        };
-        #region frequencies
+        const int size = 3; const double p = 1 / 4.0;
+        const double pa = 1.0 - p, pb = 3 * p / 4, pc = p / 4;
+        /* ‡ The original example had 26 letters, but it was too many for a demo. 
+         *   Unfortunately, the a,b and c have noting to do with the famous 'abc conjecture'...
+         *   https://en.wikipedia.org/wiki/Abc_conjecture
+         *   abc should not be confused with the BAC or CABAC coders either
+         *   https://en.wikipedia.org/wiki/Context-adaptive_binary_arithmetic_coding
+         */
+        // Administrative stuff
+        readonly int[] freqMap = new int[size],
+                       freqUnmap = new int[size] { 0, 1, 2 };
+        readonly double[] freq = new double[size] { pa, pb, pc };
+        #region EnglishAlphabetFrequencies
         /**
          * "Etaoin Shrdlu"
          * Taken from http://rinkworks.com/words/letterfreq.shtml
          */
         /*      const int size = 26;
 
-              int[] letterFreqMap = new int[size];
-              int[] letterFreqUnmap = new int[size]    { 
+              int[] freqMap = new int[size];
+              int[] freqUnmap = new int[size]    { 
                                                         4	,
                                                         0	,
                                                         8	,
@@ -84,7 +73,7 @@
                                                        };
 
 
-              double[] letterFreq = new double[size] 
+              double[] freq = new double[size] 
                                                       {
                                                         0.114212990689824	,
                                                         0.085574671966026	,
@@ -117,24 +106,31 @@
         #endregion
         public AritmeticCoder(string args)
         {
-            (text, code, C, A) = (args, 0.0m, 0.0m, 1.0m);
+            (text, code, (C, A)) = (args, 0.0m, (0.0m, 1.0m));
 
-            //  All kinds of for-loops I know...
-            //  An old school...
-            for (var index = 0; index < size; ++index)
-                letterFreqMap[letterFreqUnmap[index]] = index;
+            //  A couple of for-loops types we all know and love (sometimes too much)...
+            //  An old school (one liner - like in ol'good days)...
+            for (var index = 0; index < size; freqMap[freqUnmap[index]] = index, ++index) ;
 
-            //  ... vs. LINQ style
-            foreach (var fq in from _freq in letterFreq
-                               let freq = Convert.ToDecimal(_freq)
-                               let precision = (1 << 12) // A dozen of precision bits
-                               select Math.Floor(freq * precision) / precision)
+            //  ... vs. LINQ style (ThnX, Copilot, for a tip!)
+            //  BTW, try at home (and don't take it outside!) a version
+            //  without quantized probabilities... Good luck!
+            foreach (var qf in from fq in freq
+                               let _ = Convert.ToDecimal(fq)
+                               select Quantizer(_))
             {
-                fx.Add(fq);          // Frequencies: eg. [p, p + 3p/4, p + 1p/4].
-                Fx.Add(Fx[^1] + fq); // Cumulated frequencies: eg. [0, 1 - p, 1 - p + 3p/4].
-                                     // The last one is 1.0 and not included in the array.
+                fx.Add(qf);          // Quantized frequencies of letters
+                Fx.Add(Fx[^1] + qf); // Cumulated quantized frequencies (led by '0'),
+                                     // that is [0, 1 - p, 1 - p + 3p/4, 1] (up to quantization error)
             }
+            // For those for whom ASCII is not enough
             Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            static decimal Quantizer(decimal _x, int _precision = 12) // A dirty dozen of precision bits
+            {
+                var precision = 1 << _precision;
+                return Math.Floor(_x * precision) / precision;
+            }
         }
         ~AritmeticCoder()
         {
@@ -150,45 +146,52 @@
             var width = 96;
             // A bit of an ASCII art
             Console.WriteLine("0" + new string('.', width + 1) + "1");
-            
+
             foreach (char letter in text)
             {
-                var index = letterFreqMap[letter - 'a'];
+                var index = freqMap[letter - 'a'];
 
                 C += Fx[index] * A;
                 A *= fx[index];
-                
-                // Exception handling
-                if(A / 2m == 0m)
-                {
-                    var msg =  $"\nMessage '{text}' has too much information for a given arithmetic precision.";
-                        msg += $"Coding interval ({C}, {C + A}) not wide enough...";
-                    throw new Exception(msg);
-                }
+
+                // Exception handling (testing whether the interval is wide enough)
+                if (A / 2m == 0m) ThrowException((C, A), text);
 
                 // Visual representation of the coding interval
-                var (c, a) = (Convert.ToInt32(C * width), 1 + Convert.ToInt32(A * width));
-                Console.WriteLine("[" + new string(' ', c) + new string('.', a)
-                                      + new string(' ', width + 1 - c - a)
-                                      + $") [{C}, {C + A})");
+                PrintInterval(C, A);
             }
-            // The final code is just any number from the middle of the interval
+            // The ultimate code can be any number from the middle of the interval
             // (provided that the interval still has a middle! ;)
-            code = C + (A/2m);
+            code = C + (A / 2m);
+        }
+        // A fun from a few functions...
+        readonly Action<(decimal, decimal), string> ThrowException = (_CA, text) =>
+        {
+            var (C, A) = _CA;
+            var msg = $"\nMessage '{text}' contains too much information for a given arithmetic precision: ";
+            msg += $"the resulting coding interval ({C}, {C + A}) is not wide enough...";
+            throw new Exception(msg);
+        };
+        static void PrintInterval(decimal C, decimal A, int width = 96)
+        {                                        // ('1 +' here and there is just for aestetics)
+            var (c, a) = (Convert.ToInt32(C * width), 1 + Convert.ToInt32(A * width));
+            Console.WriteLine("[" + new string(' ', c) + new string('.', a)
+                                  + new string(' ', 1 + width - c - a)
+                                  + $") [{C}, {C + A})");
         }
 
         public void Decode()
         {
             var lenght = text.Length;
             text = "";
-            for (var _ = 0; _ < lenght; ++_)
+            while(lenght-- != 0)
             {
                 var index = Extract(code);
 
                 code -= Fx[index];
                 code /= fx[index];
 
-                var letter = letterFreqUnmap[index];
+                var letter = freqUnmap[index];
                 text += Convert.ToChar(letter + 'a');
             }
         }
@@ -217,8 +220,9 @@
             {
                 while (true)
                 {
-                    // 'Nullity' check first...
-                    if (Console.ReadLine() is string text && text != "quit")
+                    // 'Nullity' check first... Termination check second...
+                    // 'EOC' stands for 'End Of Coding'.
+                    if (Console.ReadLine() is string text && !text.EndsWith("EOC"))
                     {
                         using AritmeticCoder codec = new(text);
                         codec.Encode();
@@ -232,7 +236,7 @@
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine($"\nExpected exception has occured: {e.Message}\n");
+                Console.Error.WriteLine($"\nExpected exception: {e.Message}\n");
             }
         }
     }
