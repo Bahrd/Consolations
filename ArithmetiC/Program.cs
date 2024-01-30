@@ -13,9 +13,8 @@ namespace ArithmeticCoding
     class AritmeticCoder : IDisposable
     {
         string text;
-        decimal code;
-        decimal C, A;
-        readonly List<decimal> fx = new(), Fx = new() { 0m };
+        decimal code, C, A;
+        readonly List<decimal> fx = [], Fx = [0m];
 
         /*   Here we use a three letter alphabet: a, b, c‡.
          *   If the probabilities satisfy the inequality P(a) > P(b) + P(c) 
@@ -32,9 +31,9 @@ namespace ArithmeticCoding
          *   https://en.wikipedia.org/wiki/Context-adaptive_binary_arithmetic_coding
          */
         // Administrative stuff
-        readonly int[] freqMap = new int[size],
-                       freqUnmap = new int[size] { 0, 1, 2 };
-        readonly double[] freq = new double[size] { pa, pb, pc };
+        readonly int[] freqMap = new int[size];
+        readonly List<int> freqUnmap = [0, 1, 2];
+        readonly List<double> freqs  = [pa, pb, pc];
         #region EnglishAlphabetFrequencies
         /**
          * "Etaoin Shrdlu"
@@ -73,7 +72,7 @@ namespace ArithmeticCoding
                                                        };
 
 
-              double[] freq = new double[size] 
+              double[] freqs = new double[size] 
                                                       {
                                                         0.114212990689824	,
                                                         0.085574671966026	,
@@ -104,8 +103,16 @@ namespace ArithmeticCoding
                                                       };
         */
         #endregion
+        
         public AritmeticCoder(string args)
         {
+            // A helper lambda function for quantizing probabilities (okay in C# 12)
+            // https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#default-lambda-parameters
+            var Q = (decimal _x, int _p = 12) =>  // A dirty dozen of significant bits
+            {
+                var p = 1 << _p;
+                return Math.Floor(_x * p) / p;
+            };
             (text, code, (C, A)) = (args, 0.0m, (0.0m, 1.0m));
 
             //  A couple of for-loops types we all know and love (sometimes too much)...
@@ -115,9 +122,9 @@ namespace ArithmeticCoding
             //  ... vs. LINQ style (ThnX, Copilot, for a tip!)
             //  BTW, try at home (and don't take it outside!) a version
             //  without quantized probabilities... Good luck!
-            foreach (var qf in from fq in freq
+            foreach (var qf in from fq in freqs
                                let _ = Convert.ToDecimal(fq)
-                               select Quantizer(_))
+                               select Q(_))
             {
                 fx.Add(qf);          // Quantized frequencies of letters
                 Fx.Add(Fx[^1] + qf); // Cumulated quantized frequencies (led by '0'),
@@ -125,12 +132,6 @@ namespace ArithmeticCoding
             }
             // For those for whom ASCII is not enough
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-            static decimal Quantizer(decimal _x, int _precision = 12) // A dirty dozen of precision bits
-            {
-                var precision = 1 << _precision;
-                return Math.Floor(_x * precision) / precision;
-            }
         }
         ~AritmeticCoder()
         {
@@ -144,7 +145,7 @@ namespace ArithmeticCoding
         public void Encode()
         {
             var width = 96;
-            // A bit of an ASCII art
+            // A bit of ASCII art
             Console.WriteLine("0" + new string('.', width + 1) + "1");
 
             foreach (char letter in text)
@@ -163,23 +164,26 @@ namespace ArithmeticCoding
             // The ultimate code can be any number from the middle of the interval
             // (provided that the interval still has a middle! ;)
             code = C + (A / 2m);
+            return;        
+
+            // A helper function
+            static void PrintInterval(decimal C, decimal A, int width = 96)
+            {                                        // ('1 +' here and there is just for aestetics)
+                var (c, a) = (Convert.ToInt32(C * width), 1 + Convert.ToInt32(A * width));
+                Console.WriteLine("[" + new string(' ', c) + new string('.', a)
+                                      + new string(' ', 1 + width - c - a)
+                                      + $") [{C}, {C + A})");
+            }
         }
         // A fun from a few functions...
-        readonly Action<(decimal, decimal), string> ThrowException = (_CA, text) =>
+        readonly Action<(decimal, decimal), string> ThrowException = (_CA, _txt) =>
         {
             var (C, A) = _CA;
-            var msg = $"\nMessage '{text}' contains too much information for a given arithmetic precision: ";
+            var msg = $"\nMessage '{_txt}' contains too much information for a given arithmetic p: ";
             msg += $"the resulting coding interval ({C}, {C + A}) is not wide enough...";
             throw new Exception(msg);
         };
-        static void PrintInterval(decimal C, decimal A, int width = 96)
-        {                                        // ('1 +' here and there is just for aestetics)
-            var (c, a) = (Convert.ToInt32(C * width), 1 + Convert.ToInt32(A * width));
-            Console.WriteLine("[" + new string(' ', c) + new string('.', a)
-                                  + new string(' ', 1 + width - c - a)
-                                  + $") [{C}, {C + A})");
-        }
-
+        
         public void Decode()
         {
             var lenght = text.Length;
