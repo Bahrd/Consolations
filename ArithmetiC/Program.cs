@@ -1,8 +1,4 @@
-﻿
-using System;
-using System.Reflection;
-
-/** ArithmetiC
+﻿/** ArithmetiC
  * * 
  * * A (much too) simple arithmetic coding algorithm illustration
  * 
@@ -16,6 +12,7 @@ namespace ArithmeticCoding
 {
     class AritmeticCoder : IDisposable
     {
+        #region Fields of AC
         string text;
         decimal code, C, A;
         readonly List<decimal> fx = [], Fx = [0m];
@@ -38,12 +35,13 @@ namespace ArithmeticCoding
          */
         // Administrative stuff
         readonly int[] freqMap = new int[size];
-        readonly List<int> freqUnmap = [0, 2, 1];   // P(a) > P(c) > P(b)
+        readonly List<int> freqUnmap = [0, 2, 1];   // ENG/PL: P(a) > P(c) > P(b)
         readonly List<double> freqs  = [pa, pb, pc];
         #region EnglishAlphabetFrequencies
         /**
          * "Etaoin Shrdlu"
          * Taken from http://rinkworks.com/words/letterfreq.shtml
+         * See also: https://en.wikipedia.org/wiki/Letter_frequency#Relative_frequencies_of_letters_in_other_languages
          */
         /*      const int size = 26;
 
@@ -109,7 +107,7 @@ namespace ArithmeticCoding
                                                       };
         */
         #endregion
-        
+        #endregion
         public AritmeticCoder(string args)
         {
             // An initialization of the class fields (it's a constructor, after all!)    
@@ -167,7 +165,7 @@ namespace ArithmeticCoding
                                       + $") [{C}, {C + A})");
             }
 
-            // End of the fun... go work!
+            // End of fun... go work!
             var width = 96;
             // A bit of ASCII art
             Console.WriteLine("0" + new string('.', width + 1) + "1");
@@ -212,7 +210,7 @@ namespace ArithmeticCoding
 
         public void EncodingReport()
         {
-            Console.WriteLine($"\n\nIn the 8-bit ASCII code this message has {text.Length * 8} bits");
+            Console.WriteLine($"\n\nIn the 7-bit ASCII code this message has {text.Length * 7} bits");
             int bits_size = Convert.ToInt32(Math.Ceiling(Math.Log(size, 2)));
             Console.WriteLine($"\n\nIn the fixed-size {bits_size}-bit code this message has {text.Length * bits_size} bits");
             Console.WriteLine($"The arithmetic code of \n\n{text}\n\nis any number from interval\n[{C}, {C + A})");
