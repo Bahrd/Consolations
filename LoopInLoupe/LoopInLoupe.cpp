@@ -1,6 +1,7 @@
-﻿import std.core;
-import std.threading;
+﻿//import std.core;
+//import std.threading;
 
+import std;
 /* A account access (i.e. an obnoxiously innocuously lookin') example of
  * how we have gained parallelism at the expense of determinism...
  * A.k.a. banking debunking...
@@ -111,7 +112,7 @@ int main()
         auto [payments, withdrawals] = std::tuple(0, 0);
         // "Once upon a time..."
         // In a bank...
-        static const auto asking_for_trouble = false;
+        static const auto asking_for_trouble = true;
         auto payment = std::thread([&]()
         {
             [[likely]]

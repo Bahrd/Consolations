@@ -4,11 +4,9 @@
   */
 import std.core;
 import std.threading;
+
 int main()
 {
-    //using std::views::iota, 
-    //      std::views::filter, std::views::transform, 
-    //      std::views::take;
     using namespace std::views;
     using std::placeholders::_1, std::bind;
     using std::string, std::vformat, std::make_format_args,
@@ -50,6 +48,7 @@ int main()
     constexpr std::string_view illusion[]    { "▀▄─", "▄▀─", "▀─▄", "▄─▀" };
     for (auto y = (cout << '\n', 0); y != (0b10 << 0b10); ++y, cout << '\n')
         for (auto x = 0; x != 0b10 << 0b10; ++x, cout << illusion[y % std::ssize(illusion)]);
+    
 
     return 0;
 }

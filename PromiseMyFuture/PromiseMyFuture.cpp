@@ -1,5 +1,6 @@
 ﻿import std.core;
 import std.threading;
+
 /*
  "[...] computer programming is an art, because it applies accumulated knowledge 
   to the world, because it requires skill and ingenuity, and especially because 
@@ -12,17 +13,29 @@ using namespace std::literals;
 
 // https://en.cppreference.com/w/cpp/utility/tuple/tuple
 // helper function to join threads from a tuple of any size
-template<class Tuple, std::size_t N>
-struct tuple_joiner {
-    static void join(Tuple& t)
+
+template<class thread_tuple_t, std::size_t N>
+concept Joinable = requires (thread_tuple_t t)
+{
+    std::get<N - 1>(t).join();
+};
+
+template<class thread_tuple_t, std::size_t N>
+    requires Joinable< thread_tuple_t, N>
+struct thread_tuple_joiner 
+{
+    static void join(thread_tuple_t& t)
     {
-        tuple_joiner<Tuple, N - 1>::join(t);
+        thread_tuple_joiner<thread_tuple_t, N - 1>::join(t);
         std::get<N - 1>(t).join();
     }
 };
-template<class Tuple>
-struct tuple_joiner<Tuple, 1> {
-    static void join(Tuple& t)
+
+template<class thread_tuple_t>
+    requires requires (thread_tuple_t t) { std::get<0>(t).join(); } // A syntactic hiccup...
+struct thread_tuple_joiner<thread_tuple_t, 1>
+{
+    static void join(thread_tuple_t& t)
     {
         std::get<0>(t).join();
     }
@@ -30,7 +43,7 @@ struct tuple_joiner<Tuple, 1> {
 template<class... Args>
 void join_em_all(std::tuple<Args...>& t)
 {
-    tuple_joiner<decltype(t), sizeof...(Args)>::join(t);
+    thread_tuple_joiner<decltype(t), sizeof...(Args)>::join(t);
 }
 
 int main()
