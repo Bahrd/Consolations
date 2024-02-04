@@ -43,12 +43,19 @@ int main()
     // ... "you cannot step twice into the same stream"...
     std::ranges::copy(lambada, std::ostream_iterator<string>(cout, "\t"));
 
-    // See https://en.cppreference.com/w/cpp/string/basic_string_view 
-    // & use: 'chcp 65001' in Windows Terminal/PowerShell
-    constexpr std::string_view illusion[]    { "▀▄─", "▄▀─", "▀─▄", "▄─▀" };
-    for (auto y = (cout << '\n', 0); y != (0b10 << 0b10); ++y, cout << '\n')
-        for (auto x = 0; x != 0b10 << 0b10; ++x, cout << illusion[y % std::ssize(illusion)]);
+    /* See https://en.cppreference.com/w/cpp/string/basic_string_view 
+       & use: 'chcp 65001' in Windows Command Prompt 
+       https://stackoverflow.com/questions/49476326/displaying-unicode-in-powershell
     
+       PowerShell requires the following command to be invoked
+       '$OutputEncoding = [Console]::InputEncoding = [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding'
+       
+       Conveniently, once for all, in the config file with an alias '$PROFILE' (usually, 
+       'Microsoft.PowerShell_profile.ps1') located in the '$HOME\Documents\WindowsPowerShell\' directory
+    */
+    constexpr std::string_view illusion[]{ "▀▄─", "▄▀─", "▀─▄", "▄─▀" };
+    for (auto y = (cout << '\n', 0); y != (0b01 << 0b11); ++y, cout << '\n')
+        for (auto x = 0; x != 0b10 << 0b11; ++x, cout << illusion[y % std::ssize(illusion)]);
 
     return 0;
 }
