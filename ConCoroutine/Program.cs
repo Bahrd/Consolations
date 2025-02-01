@@ -28,8 +28,7 @@ namespace ConCoroutine
             Console.WriteLine();
             
             // In old-C style...
-            for (var n = 0x0; n < TheExpo; ++n)
-                Console.Write("{0:x}\t", 0x1 << n);
+            for (var n = 0x0; n < TheExpo; Console.Write("{0:x}\t", 0x1 << n), ++n);
             Console.WriteLine();
             
             // Coroutines and LINQ... Take I

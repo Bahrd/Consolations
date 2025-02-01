@@ -1,4 +1,6 @@
 ﻿// Template computing (like in the old days) compile-time version
+// https://en.cppreference.com/w/cpp/language/operators#Array_subscript_operator
+// "or C++17's std::gcd"
 template <int k, int l>
 struct gcd
 {
@@ -16,7 +18,7 @@ template <auto w, auto M, auto k = w, auto = 0>
 struct mi
 {
 	static constexpr auto res = (k - 1) * M % w,
-		                    μ = mi<w, M, k - 1, res>::μ;
+		μ = mi<w, M, k - 1, res>::μ;
 };
 template <auto w, auto M, auto k>
 struct mi<w, M, k, 1>
@@ -57,7 +59,7 @@ stpl3i rtii(auto a, auto b)
 }
 auto rtmi(auto a, auto b)
 {
-	int x; std::tie(std::ignore, std::ignore, x) = rtii(a, b);
+	decltype(a) x; std::tie(std::ignore, std::ignore, x) = rtii(a, b);
 	return (a + x) % a;
 }
 
@@ -69,10 +71,10 @@ private:
 	template <auto _a, auto _b>
 	struct _
 	{
-		using __ = _<_b% _a, _a>;
+		using __ = _<_b % _a, _a>;
 		static constexpr auto g = __::g,
-							  y = __::x - (_b / _a) * __::y,
-							  x = __::y;
+			y = __::x - (_b / _a) * __::y,
+			x = __::y;
 	};
 	template <auto _b>
 	struct _<0, _b>
@@ -84,17 +86,17 @@ public:
 	static_assert(_<a, b>::g == 1);
 };
 
-// Contemporary, compile- and run-time implementation
-consteval stpl3i imi(auto a, auto b)
+//Contemporary, compile- and run-time implementation
+static consteval stpl3i imi(auto a, auto b)
 {
 	if (a)
 	{
 		auto _ = imi(b % a, a);
-		return tuple(get<0>(_),
-					 get<2>(_) - (b / a) * get<1>(_),
-					 get<1>(_));
+		return tuple(get<0>(imi(b % a, a)),
+					 get<2>(imi(b % a, a)) - (b / a) * get<1>(imi(b % a, a)),
+				     get<1>(imi(b % a, a)));
 	}
-	return tuple(b, 0, 1);
+	else return tuple(b, 0, 1);
 }
 consteval auto mim(auto a, auto b)
 {
@@ -103,16 +105,20 @@ consteval auto mim(auto a, auto b)
 
 int main()
 {
-	const auto p{197}, q(85);
+	const auto p{ 197 }, q(85);
 	static_assert(gcd<p, q>::value == 1, "gcd(p, q) != 1...");
+
+	constexpr auto x = im<p, q>::x,
+	               y = mi<p, q>::μ;
+	assert(x == rtmi(p, q));	
+
+	constexpr auto a = not(x * q % p != 1 or y != x), // A smart compiler has its say here...
+				   b = x * q % p == 1 and y == x;     // A bit of Boolean algebra. Namely, the De Morgan's laws. 
+	static_assert(a && b, "Something's fishy...");
 	
-	constexpr auto x = im<p, q>::x, y = mi<p, q>::μ, z = mim(p, q); 
-	constexpr auto a = not(x * q % p != 1  or y != x  or z != y), // A bit of Boolean algebra...
-		           b =     x * q % p == 1 and y == x and z == y;  // namely, the De Morgan's laws. 
-	static_assert(a && b, "Something's fishy..."); 
-	
-	auto [_, __, v] {imi(p, q)};
-	assert(v == rtmi(p, q));
-	
-	return v - x + y - z;
+	constexpr auto v = get<2>(imi(p, q)),
+		           z = mim(p, q);
+	static_assert(v && z, "Something's suspicious...");
+
+	return y - x + z - v;
 }

@@ -50,6 +50,7 @@ namespace HoneCScore
                 allϑs.Add(ϑ);
 
             int Noϑ = 1; var ρ = new Random();
+            // See: https://www.youtube.com/watch?v=WqXgl8EZzcs for a 'WhenEach' pattern in C# .NET 9.0
             while (allϑs.Any())
             {
                 Console.WriteLine($"The ϑ-burger №{Noϑ++} is being prepared");

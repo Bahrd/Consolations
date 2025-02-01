@@ -8,6 +8,7 @@
 */
 
 import std.core;
+import std.threading;
 /*"Programming is one of the most difficult branches of applied mathematics;
    the poorer mathematicians had better remain pure mathematicians."
    Edsger W Dijkstra, "How do we tell truths that might hurt?", 1975
@@ -41,11 +42,11 @@ constexpr auto _n(auto _)
 int main()
 {
     constexpr auto _0_ = _0(),
-                   _1_ = _n(_0_),
-                   _2_ = _n(_n(_0_));
-    static_assert( _2_ + _1_ == _n(_2_));
+        _1_ = _n(_0_),
+        _2_ = _n(_n(_0_));
+    static_assert(_2_ + _1_ == _n(_2_));
 
-    // https://en.cppreference.com/w/cpp/thread/future & https://en.cppreference.com/w/cpp/thread/promise
+// https://en.cppreference.com/w/cpp/thread/future & https://en.cppreference.com/w/cpp/thread/promise
     // https://sodocumentation.net/cplusplus/topic/9840/futures-and-promises 
     auto a_fun_fun = std::async(std::launch::deferred,
                               varia_temp_type<int, std::string, char, double>,

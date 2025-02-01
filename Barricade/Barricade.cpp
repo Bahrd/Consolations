@@ -8,21 +8,23 @@
 // chcp 65001 - to see notes in a terminal!
 int main() 
 {
-    const auto itinerary = { "AZ", "NM", "CO", "UT", "NV", "▀▄▀▄"};
-    auto phase = "♫ ... when the ⅄⅃LY breaks!\n" "Wherever I may roam! ♫\n";
-    std::barrier sync_point(std::ssize(itinerary), [&phase]() noexcept
-    {
-        std::cout << phase;
-        phase = "... back home!\n";
-    });
+    const auto itinerary = { "AZ", "NM", "CO", "UT", "NV", "CA"};
+    std::barrier sync_point(std::ssize(itinerary), []() noexcept
+                                                   {
+                                                       std::cout << "▀▄▀▄\n";
+                                                   });
 
-    auto pass = [&](std::string state_name)
+    auto pass = [&sync_point](std::string state_name)
     {
-        std::string itinerary_report = "♫ Ramble on, " + state_name + "♫!\n";
+        auto itinerary_report = "♫ Ramble on, " + state_name + "♫!\n";
         std::cout << itinerary_report;
         sync_point.arrive_and_wait();
 
         itinerary_report = "@" + state_name + "♫ Turn the page...♫\n";
+        std::cout << itinerary_report;
+        sync_point.arrive_and_wait();
+
+        itinerary_report = "@" + state_name + "♫ Riders on the storm...♫\n";
         std::cout << itinerary_report;
         sync_point.arrive_and_wait();
     };

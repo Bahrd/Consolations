@@ -17,6 +17,13 @@ struct tt_profile
 }
 dream_team[] = {{"Fabian Cancellara"}, 
                 {"Filippo Ganna"}, 
+                {"Bradley Wiggins"}, 
+                {"Tom Dumoulin"}, 
+                {"Rohan Dennis"}, 
+                {"Alex Dowsett"}, 
+                {"Victor Campenaerts"}, 
+                {"Primoz Roglic"}, 
+                {"Geraint Thomas"},
                 {"Tony Martin"}};
 int main() 
 {

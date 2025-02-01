@@ -55,9 +55,11 @@ first_arg_t<Args...>::T g(Args... args)
 
 int main()
 {
-    std::cout << std::noboolalpha << std::tuple{ 1, '1', "1", std::tuple{ 1.0, (true, false) }} << std::endl
-              << std::boolalpha   << std::tuple{ 0, "0", '0', std::tuple{ 0.0, (false, true) }} << std::endl
-              << std::bitset<0b111> {add(0b1, 0b10, 0'111, 0x10, 0x1)} << std::endl  // Pick trick...
-              << std::format("{:b}", add(0b1, 0b10, 0'111, 0x10, 0x1)) << std::endl; // ... or threat
+    using namespace std;
+    // Note (x, y) is not a tuple, it is a C's comma operator, that yields y!
+    cout << noboolalpha << tuple{ 1, '1', "1", tuple{ 1.0, ("true", false)}} << endl
+         << boolalpha   << tuple{ 0, "0", '0', tuple{ 0.0, (("true", false), true)}} << endl
+         << bitset<0b111> {add(0b1, 0b10, 0'111, 0x10, 0x1)} << endl  // Pick trick...
+         << format("{:b}", add(0b1, 0b10, 0'111, 0x10, 0x1)) << endl; // ... or threat
     return 0;
 }

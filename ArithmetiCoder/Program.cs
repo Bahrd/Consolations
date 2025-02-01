@@ -1,4 +1,7 @@
-﻿/** ArithmetiC
+﻿
+using System.Collections.Generic;
+
+/** ArithmetiC
  * * 
  * * A (much too) simple arithmetic coding algorithm illustration
  * 
@@ -17,26 +20,32 @@ namespace ArithmeticCoding
         decimal code, C, A;
         readonly List<decimal> fx = [], Fx = [0m];
 
-        /*   Here we use a three letter alphabet: a, b, c‡.
-         *   If the probabilities satisfy the inequality P(a) > P(b) + P(c) 
+        /* ‡ The original example had even 26 letters, but it was too many for a demo. 
+         *   Unfortunately, the a,b and c have noting to do with the famous 'abc conjecture'...
+         *   https://en.wikipedia.org/wiki/Abc_conjecture
+         *   abc should not be confused with the BAC or CABAC coders either
+         *   https://en.wikipedia.org/wiki/Context-adaptive_binary_arithmetic_coding
+         *
+         *   Here we use a three letter alphabet: a, b, c‡.
+         *   If the probabilities satisfy the inequality P(a) >> P(b) + P(c) 
          *   (so that the entropy of the source is close(r) to zero),
          *   the advantage of arithmetic coding over any block coding algorithm 
          *   can be seen in its full glory.
          *   
          *   https://en.wikipedia.org/wiki/Feigenbaum_constants#Value - the source of the "magic" constant
+             const int size = 3; 
+             const double p = 1 / 4.669201609102990671853203820466;
+             const double pa = 1.0 - p, pb = 3 * p / 4, pc = p / 4;
          */
-        const int size = 3; const double p = 1 / 4.669201609102990671853203820466;
-        const double pa = 1.0 - p, pb = 3 * p / 4, pc = p / 4;
-        /* ‡ The original example had 26 letters, but it was too many for a demo. 
-         *   Unfortunately, the a,b and c have noting to do with the famous 'abc conjecture'...
-         *   https://en.wikipedia.org/wiki/Abc_conjecture
-         *   abc should not be confused with the BAC or CABAC coders either
-         *   https://en.wikipedia.org/wiki/Context-adaptive_binary_arithmetic_coding
-         */
+        // BAC
+        const int size = 2;
+        readonly double p;
+        readonly double pa, pb;
         // Administrative stuff
         readonly int[] freqMap = new int[size];
-        readonly List<int> freqUnmap = [0, 2, 1];   // ENG/PL: P(a) > P(c) > P(b)
-        readonly List<double> freqs  = [pa, pb, pc];
+        readonly List<int> freqUnmap = [0, 1];
+        readonly List<double> freqs;
+
         #region EnglishAlphabetFrequencies
         /**
          * "Etaoin Shrdlu"
@@ -108,10 +117,15 @@ namespace ArithmeticCoding
         */
         #endregion
         #endregion
-        public AritmeticCoder(string args)
+        public AritmeticCoder(double prob, string txt)
         {
+            // Administrative stuff
+            p = prob; 
+            (pa, pb) = (1.0 - p, p);
+            freqs = [pa, pb];
+
             // An initialization of the class fields (it's a constructor, after all!)    
-            (text, code, (C, A)) = (args, 0.0m, (0.0m, 1.0m));
+            (text, code, (C, A)) = (txt, 0.0m, (0.0m, 1.0m));
 
             //  And a couple of for-loops types we all know and love (sometimes too much)...
             //  1. An old school (one liner - like in ol'good days)...
@@ -132,11 +146,10 @@ namespace ArithmeticCoding
                       let _ = Convert.ToDecimal(fq)
                       select Qx(_);
             var _Fx = _fx.Select((_, index) => _fx.Take(index).Sum()); // ... and their partial sums
-            (fx, Fx) = (_fx.ToList(), _Fx.ToList());  
-            
+            (fx, Fx) = (_fx.ToList(), _Fx.ToList());
+
             // 3. ... and a for-each                 Fx[^1]
             //foreach (var f in fx[0..^1]) Fx.Add(Fx.Last() + f); // Cumulated quantized frequencies
-            Console.OutputEncoding = System.Text.Encoding.UTF8;   // For those for whom ASCII is not enough
         }
         ~AritmeticCoder()
         {
@@ -157,7 +170,7 @@ namespace ArithmeticCoding
                         + $"the resulting coding interval ({C}, {C + A}) is not wide enough...";
                 throw new Exception(msg);
             };
-            static void PrintInterval(decimal C, decimal A, int width = 96)
+            static void PrintInterval(decimal C, decimal A, int width = 0x100 - 0b100)
             {                                        // ('1 +' here and there is just for aestetics)
                 var (c, a) = (Convert.ToInt32(C * width), 1 + Convert.ToInt32(A * width));
                 Console.WriteLine("[" + new string(' ', c) + new string('.', a)
@@ -166,13 +179,13 @@ namespace ArithmeticCoding
             }
 
             // End of fun... go work!
-            var width = 96;
+            var width = 0x100 - 0b100;
             // A bit of ASCII art
             Console.WriteLine("0" + new string('.', width + 1) + "1");
 
             foreach (char letter in text)
             {
-                var index = freqMap[letter - 'a'];
+                var index = freqMap[letter - '0'];
 
                 C += Fx[index] * A;
                 A *= fx[index];
@@ -180,7 +193,7 @@ namespace ArithmeticCoding
                 // Exception handling (testing whether the interval is wide enough)
                 if (A / 2m == 0m) ThrowException((C, A), text);
 
-                // Visual representation of the coding interval
+                // Visual representation of the code interval
                 PrintInterval(C, A);
             }
             // The ultimate code can be any number from the middle of the interval
@@ -188,12 +201,11 @@ namespace ArithmeticCoding
             code = C + (A / 2m);
             return;        
         }
-
         public void Decode()
         {
             // A couple of helper functions
             int Extract(decimal val) => Array.FindLastIndex(Fx.ToArray(), x => x < val);
-            char Letter(int index) => Convert.ToChar(freqUnmap[index] + 'a');
+            char Letter(int index) => Convert.ToChar(freqUnmap[index] + '0');
 
             var lenght = text.Length;
             text = "";
@@ -207,7 +219,6 @@ namespace ArithmeticCoding
                 text += Letter(index);
             }
         }
-
         public void EncodingReport()
         {
             Console.WriteLine($"\n\nIn the 7-bit ASCII code this message has {text.Length * 7} bits");
@@ -222,17 +233,32 @@ namespace ArithmeticCoding
         {
             Console.WriteLine($"\n\nThe decoded message is:\n{text}\n");
         }
-        static void Main()
+        static void Main(string []args)
         {
             try
             {
                 while (true)
                 {
+                    // For those for whom ASCII is not enough
+                    Console.OutputEncoding = System.Text.Encoding.UTF8;
+                    // Bureaucracy and bookkeeping
+                    var (pr, cooltura) = args.Length > 1 ? (args[0], args[1])
+                                                         : ("1.0/2.0", "en-US");   
+                    // https://stackoverflow.com/questions/13354211/how-to-set-default-culture-info-for-entire-c-sharp-application
+                    var coolUS = System.Globalization.CultureInfo.CreateSpecificCulture(cooltura);
+                    Thread.CurrentThread.CurrentCulture = coolUS;
+
+                    // Now we are convertin'!
+                    var p = Convert.ToDouble(pr);
                     // 'Nullity' check first... Termination check second...
                     // 'EOC' stands for 'End Of Coding'.
-                    if (Console.ReadLine() is string text && !text.EndsWith("EOC"))
+                    if (Console.ReadLine() is string text && text != "" && !text.EndsWith("EOC"))
                     {
-                        using AritmeticCoder codec = new(text);
+                        var Hp = -p * Math.Log(p, 2) - (1 - p) * Math.Log(1 - p, 2);
+                        Console.WriteLine($"P(1) = {p:0.###}, H(p) = {Hp:0.###} [bit/s]");
+
+                        // ... and the real stuff
+                        using AritmeticCoder codec = new(p, text);
                         codec.Encode();
                         codec.EncodingReport();
 

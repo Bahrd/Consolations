@@ -1,0 +1,3 @@
+C:/Users/Przem/source/repos/Bahrd/Consolations/CClatchCC/CMakeFiles/CClatchCC.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/CClatchCC/CMakeFiles/ALL_BUILD.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/CClatchCC/CMakeFiles/ZERO_CHECK.dir

@@ -1,0 +1,9 @@
+C:/Users/Przem/source/repos/Bahrd/Consolations/CMakeFiles/ALL_BUILD.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/CMakeFiles/ZERO_CHECK.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/FFT/CMakeFiles/fft.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/VariadicAsyncT/CMakeFiles/VariadicAsyncT.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/MetaTemplates/CMakeFiles/MetaTemplates.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/SummAnonymous/CMakeFiles/SummAnonymous.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/Barricade/CMakeFiles/Barricade.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/CClatchCC/CMakeFiles/CClatchCC.dir
+C:/Users/Przem/source/repos/Bahrd/Consolations/AtomicLoopInLoupe/CMakeFiles/AtomicLoopInLoupe.dir
